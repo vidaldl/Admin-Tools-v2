@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extension Settings</title>
+  <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+  <h2>Settings</h2>
+  <!-- Functionalities Start -->
+  <label data-tooltip="When you go to the associated courses tab in a blueprint course, this will make each course title a link to the correct course.">
+    <input type="checkbox" id="associatedBpCourse"> Enable Associated BP Course
+  </label>
+  <br>
+  <label data-tooltip="This will add a link to the modules navbar at the bottom of the page that links to the parent blueprint. If there is no blueprint for the course nothing will show up there. Operates seperate of the module navbar, so it will show up with or without the navbar option being selected.">
+    <input type="checkbox" id="linkToBpParentAccount"> Enable Link to BP Parent Account
+  </label>
+  <br>
+  <label data-tooltip="This will display the sections for the course in the breadcrumb after the course name. If a section was cross-listed into the course, it is highlighted in blue. Blueprint courses display as 'BP', Reference courses as 'REF', and courses that do not have sections but have a long title, are shortened to five letters.">
+    <input type="checkbox" id="displaySectionInBreadcrumb"> Display Section in Breadcrumb
+  </label>
+  <br>
+  <label data-tooltip="This will display a new column listing the sections for each course on the right side of the search results. If a section was cross - listed into the course, it is highlighted in blue. Blueprint courses display as 'BP', Reference courses as 'REF', and courses that do not have sections but have a long title, are shortened to five letters.">
+    <input type="checkbox" id="sectionColumn"> Enable Section Column
+  </label>
+  <!-- Functionalities END -->
+
+
+<script src="js/settings.js"></script>
+</body>
+</html>

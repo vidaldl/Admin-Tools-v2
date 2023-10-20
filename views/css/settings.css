@@ -1,0 +1,15 @@
+[data-tooltip]:hover:after {
+    content: attr(data-tooltip);
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    z-index: 1000;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 5px;
+    font-size: 0.8rem;
+}
