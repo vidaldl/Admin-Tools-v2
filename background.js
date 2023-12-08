@@ -2,32 +2,15 @@ import { copyAllBrokenLinks } from './scripts/copyAllBrokenLinks/background.js';
 
 
 
- //imported from backgroundScripts so we can keep the background.js file looking clean
+/****
+ *
+ * Adds a button to the right click menu titled "Copy All Broken Links"
+ * Creates a popup that allows the user to copy a formatted version of the
+ * links in the Course Link Validator.
+ *
+ * Affected URLs:
+ * "[canvas_instance]/course/[courseId]/link_validator"
+ *
+ ****/
  copyAllBrokenLinks();
 
- // hears the message from the ContentSctipt and collects the arrays
- // It then stores the arrays to the local storage
- // It then opens a popup
- chrome.runtime.onMessage.addListener(function (request) {
- if (request.action === "sendArraysToBackground") {
-   console.log("Page Url Array received in the background");
-   let PageUrls = request.array1;
-   let BrokenLinks = request.array2;
-   let Titles = request.array3;
-
-
-     chrome.storage.local.set({
-         brokenLinksPageUrls: PageUrls,
-         brokenLinksURLS: BrokenLinks,
-         brokenLinksTitles: Titles
-     }, function() {
-         chrome.windows.create({
-             type: 'popup',
-             url: './scripts/copyAllBrokenLinks/copyAllBrokenLinksPopup.html',
-             width: 630,
-             height: 325
-         });
-     });
-
- }
- });
