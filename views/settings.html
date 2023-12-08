@@ -1,32 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Extension Settings</title>
+  <title>Options | BYUI Canvas Admin Tools</title>
   <link rel="stylesheet" href="css/settings.css">
 </head>
+
 <body>
-  <h2>Settings</h2>
-  <!-- Functionalities Start -->
-  <label data-tooltip="When you go to the associated courses tab in a blueprint course, this will make each course title a link to the correct course.">
-    <input type="checkbox" id="associatedBpCourse"> Enable Associated BP Course
-  </label>
-  <br>
-  <label data-tooltip="This will add a link to the modules navbar at the bottom of the page that links to the parent blueprint. If there is no blueprint for the course nothing will show up there. Operates seperate of the module navbar, so it will show up with or without the navbar option being selected.">
-    <input type="checkbox" id="linkToBpParentAccount"> Enable Link to BP Parent Account
-  </label>
-  <br>
-  <label data-tooltip="This will display the sections for the course in the breadcrumb after the course name. If a section was cross-listed into the course, it is highlighted in blue. Blueprint courses display as 'BP', Reference courses as 'REF', and courses that do not have sections but have a long title, are shortened to five letters.">
-    <input type="checkbox" id="displaySectionInBreadcrumb"> Display Section in Breadcrumb
-  </label>
-  <br>
-  <label data-tooltip="This will display a new column listing the sections for each course on the right side of the search results. If a section was cross - listed into the course, it is highlighted in blue. Blueprint courses display as 'BP', Reference courses as 'REF', and courses that do not have sections but have a long title, are shortened to five letters.">
-    <input type="checkbox" id="sectionColumn"> Enable Section Column
-  </label>
-  <!-- Functionalities END -->
+<header>
+  <h1>BYUI Canvas Admin Tools</h1>
+  <div id="allUpdates">&#9776</div>
+</header>
 
+<div id="extension" class="flex-container">
+  <div class="outer-container" id="popup_container">
+    <h3>Popup clickables</h3>
+    <p class='install-info'>The tools under this label will only run when you click the button in the
+      popup. The button
+      will only appear if the option below is selected. These tools primarily automate tasks. They turn
+      several button
+      clicks into just a few.</p>
+    <div id="popup" class="options-container">
+    </div>
+  </div>
+  <div class="outer-container" id="display_container">
+    <h3>Displays</h3>
+    <p class='install-info'>The tools under the Displays label will run automatically on the correct pages.
+      The purpose of
+      these tools is to make navigation easier. There are a couple that do things when clicked, but most
+      of them are for
+      navigation.</p>
+    <div id="display" class="options-container">
+    </div>
+  </div>
+</div>
+<button id="feedback-button" class="feedback-button modal-trigger" href="#feedback-div">
+  <i>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V6h2v4z"
+            style="fill:white" /></svg></i>Feedback</button>
+<div id="feedback-div">
+  <div class="modal-content" style="height: 600px;">
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfi5GqmbFeZr3zZOxo4clobgmHfW27i6iHvpUCmOGhq5jVlLQ/viewform?embedded=true"
+            width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">Loading...</iframe>
+  </div>
+</div>
 
+<script src="js/createSettingsPage.js"></script>
+<script src="js/firstOpenSettings.js"></script>
 <script src="js/settings.js"></script>
 </body>
+
 </html>
