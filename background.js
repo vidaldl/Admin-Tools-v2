@@ -1,4 +1,4 @@
-import { copyAllBrokenLinks } from './scripts/copyAllBrokenLinks/copyAllBrokenLinksBackground.js';
+import { copyAllBrokenLinks } from './scripts/copyAllBrokenLinks/background.js';
 
 
 
