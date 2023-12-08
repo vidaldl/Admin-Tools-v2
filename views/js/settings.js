@@ -23,7 +23,7 @@ function getJson() {
         var request = new XMLHttpRequest();
         request.addEventListener('load', receive);
         request.addEventListener('error', onError);
-        request.open('GET', `chrome-extension://${extId}/options.json`);
+        request.open('GET', `chrome-extension://${extId}/views/settings.json`);
         request.send();
     });
 }
