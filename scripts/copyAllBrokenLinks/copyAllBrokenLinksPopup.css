@@ -1,0 +1,170 @@
+/* all of the css for the popup that opens */
+
+*{
+    box-sizing: border-box;
+    
+    margin:0;
+    padding: 0;
+    border: 0;
+    
+    
+}
+
+
+
+html {
+    height: 100%;
+    width: 100%;
+    
+}
+
+body {
+    min-height: 100%;
+    width: 100%;
+}
+
+
+main{
+    display: flex;
+    height: calc(100% - 70px);
+}
+
+
+header{
+    display: flex;
+}
+
+section{
+    display:flex;
+    justify-content: space-between;
+    height:100%;
+}
+
+#copyBrokenLinksButton{
+    margin-right:10%;
+}
+
+#copyLinkTextButton{
+    margin-left: 10%;
+}
+
+
+
+p{
+    text-align: center;
+    
+}
+
+body{
+    height: 100%;
+    width: 100%;
+}
+
+.p_div{
+    height: 80%;
+    text-align: center;
+    justify-items: center;
+}
+
+
+
+h2{
+    text-align: center;
+    color: white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+button{
+    align-self: center;
+    
+
+}
+
+button:hover{
+    background-color:rgb(40, 40, 205);
+    color: white;
+}
+
+button:active{
+    box-shadow: 2px 2px 5px #0e0157;
+}
+
+.popup_content{
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+.textarea_div{
+    height:auto;
+}
+
+.link_text,.page_urls,.broken_links{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.textarea{
+    height: 70vh;
+    width: 32.9%;
+    background-color: grey;
+    resize: none;
+    margin: 5px;
+    
+}
+
+.header_link_text,.header_page_url,.header_broken_links{
+    height: 50px;
+    width: 200px;
+}
+
+.Headers{
+    /* display: grid;
+    grid-template-columns: 1fr, 1fr, 1fr;
+    grid-template-rows: 1fr,2fr 1fr; */
+    height: 70px;
+    width: 100%;
+    grid-gap: 10px;
+    
+}
+
+.header_link_text{
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    text-align: center;
+}
+
+.link_text{
+    background-color: rgb(47, 47, 202);
+}
+
+.header_page_url{
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    text-align: center;
+}
+
+.page_urls{
+    background-color: rgb(47, 47, 202);
+}
+
+.header_broken_links{
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    text-align: center;
+}
+
+.broken_links{
+    background-color: rgb(47, 47, 202);
+}
+
+html{
+    height: 100%;
+}
+
+.buttons_all{
+    grid-column: 2 / 3;
+    text-align: center;
+    
+}
