@@ -9,7 +9,7 @@ import { copyAllBrokenLinks } from './scripts/copyAllBrokenLinks/background.js';
  * links in the Course Link Validator.
  *
  * Affected URLs:
- * "[canvas_instance]/course/[courseId]/link_validator"
+ * [canvas_instance]/course/[courseId]/link_validator
  *
  ****/
  copyAllBrokenLinks();

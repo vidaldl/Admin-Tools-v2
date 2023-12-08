@@ -1,5 +1,17 @@
 
-//exports these fuctions so the background script can use them
+/****
+ *
+ * This function is meant to be imported in the main background.js file.
+ *
+ * I. Creates a context menu item named "Copy ALl Broken Links".
+ * II. Scrapes and sanitizes data from the affected URL pages through "contentScript.js".
+ * III. Creates a popup with formatted data that is ready to be pasted in a Spreadsheet.
+ *
+ *
+ * Affected URLs:
+ * [canvas_instance]/course/[courseId]/link_validator
+ *
+ ****/
 export function copyAllBrokenLinks () {
 
     // creates a clickable link in the right click menu

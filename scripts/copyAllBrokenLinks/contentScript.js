@@ -56,7 +56,7 @@ function selectAllTitles()
 {
   const titles = document.querySelectorAll('.result ul > li > a');
   //console.log(titles);
-  const titlesArray = Array.from(titles).map(title => title.textContent);
+  let titlesArray = Array.from(titles).map(title => title.textContent);
 
   return titlesArray;
 }
