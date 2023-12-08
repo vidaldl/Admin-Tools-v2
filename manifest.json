@@ -16,13 +16,16 @@
     },
     "default_popup": "views/popup.html"
   },
+  "options_page": "views/settings.html",
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
-  "content_scripts": [{
-    "matches": ["https://*.instructure.com/courses/*"],
-    "js": ["scripts/features/associatedBpCourse.js"],
-    "type": "module"
-  }]
+  "content_scripts": [
+    {
+      "matches": ["https://*.instructure.com/courses/*"],
+      "js": ["scripts/associateSectionsToBlueprints/associatedBpCourse.js"],
+      "type": "module"
+    }
+  ]
 }
