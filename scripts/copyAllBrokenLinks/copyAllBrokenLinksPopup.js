@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 //gets the broken links that we previously stored in the local storage
 //uses the populateData function
 document.addEventListener('DOMContentLoaded', function() {
@@ -20,10 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
 //a new array 
 //also contains all of the button funcionality
 function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
-
-
-  /***Cleans Array of Titles***/
-
+ 
+ /**************************************************************************/ 
+/***Cleans Array of Titles***/
   let externalink ="Links to an external site."
   let Titles = Titles1.map(title => {
     if (title.includes(externalink)){
@@ -32,19 +24,20 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
     return title;
   })
 /**************************************************************************/
-  
-  /***Cleans Array of Page Urls***/
+ 
 
+/***********************************************************/
+/***Cleans Array of Page Urls***/
   // prefix that is needed to be added to the page url
   let prefix = "https://byui.instructure.com";
   
   //adds the prefix to all of the page url
   let PageUrlArray = PageUrlArray1.map(url => prefix + url);
+/***********************************************************/
 
-  /**************************************************************************/
 
-  /***Cleans Array of Broken links***/
-
+/***********************************************************************************************************/
+/***Cleans Array of Broken links***/
   let prefix2 = "https://byui.instructure.com/" ;
 
   // urls with these prases require the prefix to be added maunualy
@@ -61,9 +54,11 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
     }
     return url;
   });
-  /***********************************************************************************************************/
+/***********************************************************************************************************/
 
 
+/****************************************************************/
+/***Text areas***/
   //elements of all of the text areas
   let titlesTextArea = document.getElementById("link_text");
   let linkTextTextarea = document.getElementById("page_urls");
@@ -73,9 +68,11 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   titlesTextArea.value = Titles.join('\n');
   linkTextTextarea.value = PageUrlArray.join('\n');
   brokenLinkTextArea.value = BrokenLinkArray.join('\n');
+/****************************************************************/
 
 
-  /*** Copy Titles Button ***/
+/**************************************************************************/
+/*** Copy Titles Button ***/
   let copyTitlesButton = document.getElementById("copyLinkTextButton");
 
   function CopyTitles(){
@@ -84,11 +81,11 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   }
 
   copyTitlesButton.addEventListener('click', CopyTitles);
-  /**************************************************************************/
+/**************************************************************************/
 
 
-
-  /*** Copy Page urls Button ***/
+/**************************************************************************/
+/*** Copy Page urls Button ***/
   let copyPageUrlsButton = document.getElementById("copyPageUrlsButton");
 
   function copyPageUrls(){
@@ -97,10 +94,11 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   }
 
   copyPageUrlsButton.addEventListener('click', copyPageUrls);
-  /**************************************************************************/
+/**************************************************************************/
 
 
-  /***Copy Links Button***/
+/**************************************************************************/
+/***Copy Links Button***/
   let copyBrokenLinksButton = document.getElementById("copyBrokenLinksButton");
 
   function copyBrokenLinks(){
@@ -109,11 +107,11 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   }
 
   copyBrokenLinksButton.addEventListener('click', copyBrokenLinks);
-  /**************************************************************************/
+/**************************************************************************/
 
 
-
-  /***Copies all of the links at once Button ***/
+/**************************************************************************/
+/***Copies all of the links at once Button ***/
   let copyAllButton = document.getElementById("copyAllButton");
 
   function CopyAll(){
@@ -136,7 +134,7 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   }
 
   copyAllButton.addEventListener("click", CopyAll);
-  /**************************************************************************/
+/**************************************************************************/
 
 
 // optional setting
