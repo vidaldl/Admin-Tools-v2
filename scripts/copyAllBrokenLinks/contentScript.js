@@ -1,5 +1,9 @@
 
 
+//calling the scrape function to start the process
+scrape();
+
+
 /****
  *
  * This function is to scrape the affected URL for the following.
@@ -29,9 +33,6 @@ function scrape() {
           array1:arrayOfPageUrls, 
           array2:arrayOfBrokenLinks, 
           array3:arrayOfLinkTitles});
-    
-    } else {
-        console.log("Data retrival failed.")
     }
 }
 
@@ -40,12 +41,25 @@ function scrape() {
 
 /***
  * 
- *  Utility Functions
  * 
- *  selectHeaderHREF
+ *  Utility Functions
+ * -------------------
+ * 
+ *  selectHeaderHREF()
+ *  Process: 
+ *  Stores all of the page urls, from the affected URL, into an Array.
+ * 
+ *  selectLinksHREFs()
+ *  Process:
+ *  Stores all of the broken links, from the affected URL, into an Array.
+ * 
+ *  selectAllTitles()
+ *  Process: 
+ *  Stores all of broken link titles, from the affected URL, into an Array.
+ * 
 ***/
 
-//selects all the page urls on the page and stores it in an array
+
 function selectHeaderHREFs(){
 
   let PageUrlArray = [];
@@ -73,7 +87,7 @@ function selectHeaderHREFs(){
   return PageUrlArray;
 };
 
-//selects all of the brokenlinks on the page and stores it in an array
+
 function selectLinksHREFs() {
     // Select all <a> elements that are children of <h2> within .result
     const links = document.querySelectorAll('.result ul > li > a');
@@ -84,7 +98,7 @@ function selectLinksHREFs() {
     return hrefs;
 }
 
-//selects all of the titles of the Broken links on the page and stores it in an array
+
 function selectAllTitles()
 {
   const titles = document.querySelectorAll('.result ul > li > a');
@@ -93,11 +107,6 @@ function selectAllTitles()
 
   return titlesArray;
 }
-
-
-// calling the Scrape function  
-scrape();
-
 
 
 

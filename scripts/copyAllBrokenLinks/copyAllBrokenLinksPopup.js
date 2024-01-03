@@ -4,7 +4,7 @@
 
 
 
-//console.log("contextMenu.js loaded");
+
 
 //gets the broken links that we previously stored in the local storage
 //uses the populateData function
@@ -23,13 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
 //a new array 
 //also contains all of the button funcionality
 function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
-
-  console.log("recieved message from the background to the contextMenu.js");
-
-  console.log(Titles1);
-  console.log(PageUrlArray1);
-  console.log(BrokenLinkArray1);
-
 
   let externalink ="Links to an external site."
   let Titles = Titles1.map(title => {
@@ -59,11 +52,6 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
     }
     return url;
   });
-
-  console.log("This the Broken Link Array in contextMenu.js", BrokenLinkArray);// Replace 'yourArray' with the actual variable name
-  console.log("this is the array inside the contextMenu.js", PageUrlArray);
-  console.log("This is the titles Array in the context Menu.js ", Titles);
-
 
 
   //elements of all of the text areas
