@@ -107,8 +107,3 @@ function selectAllTitles()
 
   return titlesArray;
 }
-
-
-
-
-
