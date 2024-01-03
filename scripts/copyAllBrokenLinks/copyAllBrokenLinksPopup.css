@@ -2,12 +2,9 @@
 
 *{
     box-sizing: border-box;
-    
     margin:0;
     padding: 0;
     border: 0;
-    
-    
 }
 
 
@@ -15,7 +12,6 @@
 html {
     height: 100%;
     width: 100%;
-    
 }
 
 body {
@@ -52,7 +48,6 @@ section{
 
 p{
     text-align: center;
-    
 }
 
 body{
@@ -76,8 +71,6 @@ h2{
 
 button{
     align-self: center;
-    
-
 }
 
 button:hover{
@@ -108,10 +101,9 @@ button:active{
 .textarea{
     height: 70vh;
     width: 32.9%;
-    background-color: grey;
+    background-color: rgb(219, 222, 236);
     resize: none;
     margin: 5px;
-    
 }
 
 .header_link_text,.header_page_url,.header_broken_links{
@@ -120,13 +112,9 @@ button:active{
 }
 
 .Headers{
-    /* display: grid;
-    grid-template-columns: 1fr, 1fr, 1fr;
-    grid-template-rows: 1fr,2fr 1fr; */
     height: 70px;
     width: 100%;
     grid-gap: 10px;
-    
 }
 
 .header_link_text{
