@@ -27,9 +27,39 @@
         "https://*.instructure.com/courses/*"
       ],
       "js": [
-        "scripts/associateSectionsToBlueprints/associatedBpCourse.js"
+        "scripts/associateSectionsToBlueprints/associatedBpCourse.js",
+        "scripts/lock/lock.js"
+        
       ],
       "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/*/quizzes/*/edit"
+      ],
+      "js": [
+        "scripts/deleteQuizQuestions/deleteQuizQuestions.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/*/question_banks/*"
+      ],
+      "js": [
+        "scripts/editQuestionBanks/editQuestionBanks.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/courses/*/quizzes"
+      ],
+      "js": [
+        "scripts/deleteAllQuizzes/deleteAllQuizzes.js"
+      ], 
+      "type": "module"
     }
-  ]
+  ] 
 }
+
