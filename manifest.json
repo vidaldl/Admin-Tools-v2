@@ -24,11 +24,25 @@
   "content_scripts": [
     {
       "matches": [
+        "https://*.instructure.com/*"
+      ],
+      "js": [
+        "scripts/adminAccountName/adminAccountName.js"
+        
+      ],
+      "type": "module"
+    },
+    {
+      "matches": [
         "https://*.instructure.com/courses/*"
       ],
       "js": [
         "scripts/associateSectionsToBlueprints/associatedBpCourse.js",
-        "scripts/lock/lock.js"
+        "scripts/lock/lock.js",
+        "scripts/addBlueprintParent/addBlueprintParent.js",
+        "scripts/blueprintAssociations/blueprintAssociations.js",
+        "scripts/breadcrumbs/breadcrumbs.js"
+
         
       ],
       "type": "module"
