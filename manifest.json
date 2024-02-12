@@ -18,7 +18,7 @@
   },
   "options_page": "views/settings.html",
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "/background/background.js",
     "type": "module"
   },
   "content_scripts": [
@@ -28,7 +28,8 @@
       ],
       "js": [
         "scripts/editor/editor.js",
-        "scripts/adminAccountName/adminAccountName.js"
+        "scripts/adminAccountName/adminAccountName.js",
+        "messaging/listener.js"
         
       ],
       "type": "module"
@@ -89,7 +90,8 @@
         "https://*.instructure.com/courses/*/quizzes/*/statistics"
       ],
       "js": [
-        "scripts/getUserEmails/getUsrEmails.js"
+        "scripts/getUserEmails/getUsrEmails.js",
+        "background/jquery/jquery.min.js"
       ], 
       "type": "module"
     },
