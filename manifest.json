@@ -27,6 +27,7 @@
         "https://*.instructure.com/*"
       ],
       "js": [
+        "scripts/editor/editor.js",
         "scripts/adminAccountName/adminAccountName.js"
         
       ],
@@ -73,7 +74,43 @@
         "scripts/deleteAllQuizzes/deleteAllQuizzes.js"
       ], 
       "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/accounts/*"
+      ],
+      "js": [
+        "scripts/crossList/crossList.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/courses/*/quizzes/*/statistics"
+      ],
+      "js": [
+        "scripts/getUserEmails/getUsrEmails.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+          "https://*.instructure.com/*/modules"
+      ],
+      "js": [
+          "scripts/navToModule/navToModule.js"
+      ]
+    },
+    {
+        "matches": [
+            "https://*.instructure.com/courses/*/files*"
+        ],
+        "js": [
+            "scripts/selectAllFiles/selectAllFiles.js"
+        ]
     }
+
+    
   ] 
 }
 
