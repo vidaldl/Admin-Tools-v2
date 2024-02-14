@@ -18,18 +18,100 @@
   },
   "options_page": "views/settings.html",
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "/background/background.js",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": [
+        "https://*.instructure.com/*"
+      ],
+      "js": [
+        "scripts/editor/contentScript.js",
+        "scripts/adminAccountName/contentScript.js"
+        
+      ],
+      "type": "module"
+    },
+    {
+      "matches": [
         "https://*.instructure.com/courses/*"
       ],
       "js": [
-        "scripts/associateSectionsToBlueprints/associatedBpCourse.js"
+        "scripts/associateSectionsToBlueprints/contentScript.js",
+        "scripts/lock/contentScript.js",
+        "scripts/addBlueprintParent/contentScript.js",
+        "scripts/blueprintAssociations/contentScript.js",
+        "scripts/breadcrumbs/contentScript.js"
+
+        
       ],
       "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/*/quizzes/*/edit"
+      ],
+      "js": [
+        "scripts/deleteQuizQuestions/contentScript.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/*/question_banks/*"
+      ],
+      "js": [
+        "scripts/editQuestionBanks/contentScript.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/courses/*/quizzes"
+      ],
+      "js": [
+        "scripts/deleteAllQuizzes/contentScript.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/accounts/*"
+      ],
+      "js": [
+        "scripts/crossList/contentScript.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+        "https://*.instructure.com/courses/*/quizzes/*/statistics"
+      ],
+      "js": [
+        "scripts/getUserEmails/contentScript.js",
+        "background/jquery/jquery.min.js"
+      ], 
+      "type": "module"
+    },
+    {
+      "matches": [
+          "https://*.instructure.com/*/modules"
+      ],
+      "js": [
+          "scripts/navToModule/contentScript.js"
+      ]
+    },
+    {
+        "matches": [
+            "https://*.instructure.com/courses/*/files*"
+        ],
+        "js": [
+            "scripts/selectAllFiles/contentScript.js"
+        ]
     }
-  ]
+
+    
+  ] 
 }
+

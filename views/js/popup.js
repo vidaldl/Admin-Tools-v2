@@ -40,6 +40,9 @@ chrome.storage.sync.get({
     if (items.divsToQuestions === false) {
         document.querySelector('#addDivsToQuestions').style.display = 'none';
     }
+    if (items.adminAccountNames === false) {
+        document.querySelector('#adminAccountNames').style.display = 'none';
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
