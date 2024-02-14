@@ -116,6 +116,12 @@
           "title": "Deletes All Quizzes",
           "description": "Deletes all the quizzes in the Quizzes section.",
           "type": "popup"
+      },
+      {
+          "id": "adminAccountNames",
+          "title": "Admin Account Names",
+          "description": "In Canvas, when you click the `Admin` tab, it will show the subaccounts you have access to.",
+          "type": "display"
       }
   ],
   "install": [
