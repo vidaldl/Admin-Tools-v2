@@ -1,3 +1,14 @@
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // On any message it catches it here and runs it's respsective function
+    // This is supposed to be listening to the messages sent by main.js
+    if (message === "addDivsToQuestionBank") {
+            loadFullPage()
+                .then(clickTheButtons)
+                .catch(console.error);
+            sendResponse("Divs added!");
+    }});
+
+
 /* eslint-disable indent */
 function loadFullPage() {
     return new Promise((resolve, reject) => {

@@ -1,3 +1,16 @@
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // On any message it catches it here and runs it's respsective function
+    // This is supposed to be listening to the messages sent by main.js
+   if (message === "options") {
+            chrome.runtime.openOptionsPage();
+            sendResponse('Options opened');
+   }});
+
+
+
+
+
+
 /**************************
  *         getJson
  *

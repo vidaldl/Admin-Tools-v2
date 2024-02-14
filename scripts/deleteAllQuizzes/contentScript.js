@@ -21,6 +21,20 @@
  * Alerts the user that they're about to delete all the quizzes.
  * Deletes all the quizzes
  */
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // On any message it catches it here and runs it's respsective function
+    // This is supposed to be listening to the messages sent by main.js
+   if(message === "deleteQuizzes") {
+        deleteAllQuizzes();
+        sendResponse("Quizzes deleted!");
+   }});
+        
+
+
+
+
+
 function deleteAllQuizzes() {
     var realConfirm = window.confirm;
     window.confirm = () => true;
