@@ -28,7 +28,7 @@
       ],
       "js": [
         "scripts/editor/contentScript.js",
-        "scripts/adminAccountName/adminAccountName.js"
+        "scripts/adminAccountName/contentScript.js"
         
       ],
       "type": "module"
@@ -38,11 +38,11 @@
         "https://*.instructure.com/courses/*"
       ],
       "js": [
-        "scripts/associateSectionsToBlueprints/associatedBpCourse.js",
+        "scripts/associateSectionsToBlueprints/contentScript.js",
         "scripts/lock/contentScript.js",
-        "scripts/addBlueprintParent/addBlueprintParent.js",
-        "scripts/blueprintAssociations/blueprintAssociations.js",
-        "scripts/breadcrumbs/breadcrumbs.js"
+        "scripts/addBlueprintParent/contentScript.js",
+        "scripts/blueprintAssociations/contentScript.js",
+        "scripts/breadcrumbs/contentScript.js"
 
         
       ],
@@ -80,7 +80,7 @@
         "https://*.instructure.com/accounts/*"
       ],
       "js": [
-        "scripts/crossList/crossList.js"
+        "scripts/crossList/contentScript.js"
       ], 
       "type": "module"
     },
@@ -89,7 +89,7 @@
         "https://*.instructure.com/courses/*/quizzes/*/statistics"
       ],
       "js": [
-        "scripts/getUserEmails/getUsrEmails.js",
+        "scripts/getUserEmails/contentScript.js",
         "background/jquery/jquery.min.js"
       ], 
       "type": "module"
@@ -99,7 +99,7 @@
           "https://*.instructure.com/*/modules"
       ],
       "js": [
-          "scripts/navToModule/navToModule.js"
+          "scripts/navToModule/contentScript.js"
       ]
     },
     {
@@ -107,7 +107,7 @@
             "https://*.instructure.com/courses/*/files*"
         ],
         "js": [
-            "scripts/selectAllFiles/selectAllFiles.js"
+            "scripts/selectAllFiles/contentScript.js"
         ]
     }
 
