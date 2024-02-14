@@ -16,9 +16,10 @@ import { copyAllBrokenLinks } from '../scripts/copyAllBrokenLinks/background.js'
 
 /********************************
  *
- *
+ * Listener
  *
  ********************************/
+
 let thing = '';
 chrome.runtime.onInstalled.addListener(details => {
     if (details.reason === 'install') {

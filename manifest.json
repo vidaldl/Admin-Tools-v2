@@ -54,7 +54,7 @@
         "https://*.instructure.com/*/quizzes/*/edit"
       ],
       "js": [
-        "scripts/deleteQuizQuestions/deleteQuizQuestions.js"
+        "scripts/deleteQuizQuestions/contentScript.js"
       ], 
       "type": "module"
     },
