@@ -36,7 +36,12 @@ export function copyAllBrokenLinks () {
                     files: ['./scripts/copyAllBrokenLinks/contentScript.js']
                 });
             });
+
+                chrome.storage.local.set({'currentUrl': tab.url}, function() {
+                console.log('URL is stored in chrome.storage.local');
+            });
         }
+    
     });
 
 
@@ -64,6 +69,5 @@ export function copyAllBrokenLinks () {
 
         }
     });
-
 
 }
