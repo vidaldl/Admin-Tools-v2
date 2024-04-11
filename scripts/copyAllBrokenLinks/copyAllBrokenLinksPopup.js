@@ -2,8 +2,8 @@
 //gets the broken links that we previously stored in the local storage
 //uses the populateData function
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['brokenLinksPageUrls', 'brokenLinksURLS', 'brokenLinksTitles'], function(result) {
-    populateData(result.brokenLinksTitles, result.brokenLinksPageUrls, result.brokenLinksURLS),
+  chrome.storage.local.get(['brokenLinksPageUrls', 'brokenLinksURLS', 'brokenLinksTitles', 'currentUrl'], function(result) {
+    populateData(result.brokenLinksTitles, result.brokenLinksPageUrls, result.brokenLinksURLS,result.currentUrl),
     populateReasons(result.brokenLinksURLS)
   });
 });
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
 //takes all of the arrays as a parameter and cleans them up and stores each of them to 
 //a new array 
 //also contains all of the button funcionality
-function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
+function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
  
  /**************************************************************************/ 
 /***Cleans Array of Titles***/
@@ -39,7 +39,16 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
 
 /***********************************************************************************************************/
 /***Cleans Array of Broken links***/
+  const getMainCourseIdForBrokenLinks = (url) => {
+    let parts = url.split("/");
+    return parts[4]; // Adjust index based on URL structure
+  };
+
+  let currentId = getMainCourseIdForBrokenLinks(CurrentUrl);
+  console.log(currentId);
+
   let prefix2 = "https://byui.instructure.com/" ;
+  let prefix3 = `https://byui.instructure.com/courses/${currentId}/`;
 
   // urls with these prases require the prefix to be added maunualy
   let phrase1 = "$CANVAS_COURSE_REFERENCE$";
@@ -51,11 +60,14 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
  
   //maunual fix if the phrases are included in the link
   let BrokenLinkArray = BrokenLinkArray1.map(url => {
-    if (url.includes(phrase1) || url.includes(phrase2) || url.includes(phrase3) || url.includes(phrase4) || url.includes(phrase5)){
+    if (url.includes(phrase1) || url.includes(phrase2) || url.includes(phrase3) || url.includes(phrase4)){
       return prefix2 + url;
-    }
+    } else if (url.includes(phrase5)) {
+      return prefix3 + url;
+    } 
     return url;
   });
+
 /***********************************************************************************************************/
 
 
@@ -160,33 +172,38 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
 
 
 
-
+//FUNCTION: takes all the urls, cleans them//
+//PARAMETERS: the Broken Link array
+//RETURNS a list of broken link urls       // 
 
 function populateReasons(BrokenLinkArray2){
-  
-  /***Cleans Array of Broken links***/
-  let prefix2 = "https://byui.instructure.com/" ;
-
-  // urls with these prases require the prefix to be added maunualy
-  let phrase1 = "$CANVAS_COURSE_REFERENCE$";
-  let phrase2 = "/courses";
-  let phrase3 = "$CANVAS_OBJECT_REFERENCE$";
-  let phrase4 = "media_objects_iframe";
-  let phrase5 = "%24CANVAS_OBJECT_REFERENCE%24"
-
-  //Retreives a cleaned array of Broken links
-  let BrokenLinkArrayForReasons = BrokenLinkArray2.map(url => {
-    if (url.includes(phrase1) || url.includes(phrase2) || url.includes(phrase3) || url.includes(phrase4) || url.includes(phrase5) ){
-      return prefix2 + url;
-    }
-    return url;
-  });
-
 
   chrome.storage.local.get(['currentUrl'], function(result) {
     if (result.currentUrl) {
+
         let storedCurrentUrl = result.currentUrl;
+        
+        /***Cleans Array of Broken links***/
+        let prefix2 = "https://byui.instructure.com/" ;
+        let prefix3 = `https://byui.instructure.com/courses/${result.currentUrl}/`;
+
+        // urls with these prases require the prefix to be added maunualy
+        let phrase1 = "$CANVAS_COURSE_REFERENCE$";
+        let phrase2 = "/courses";
+        let phrase3 = "$CANVAS_OBJECT_REFERENCE$";
+        let phrase4 = "media_objects_iframe";
+        let phrase5 = "%24CANVAS_OBJECT_REFERENCE%24"
         console.log("Retrieved URL from Chrome.storage.local", storedCurrentUrl);
+
+        //Retreives a cleaned array of Broken links
+        let BrokenLinkArrayForReasons = BrokenLinkArray2.map(url => {
+        if (url.includes(phrase1) || url.includes(phrase2) || url.includes(phrase3) || url.includes(phrase4) ){
+            return prefix2 + url;
+          } else if(url.includes(phrase5)){
+            return prefix3 + url;
+          }
+        return url;
+        });
 
         // Use storedCurrentUrl as the course URL to get the main course ID
         const mainCourseID = getMainCourseId(storedCurrentUrl);
@@ -197,13 +214,20 @@ function populateReasons(BrokenLinkArray2){
     }
 });
 
-// Function to extract the main course ID from a URL
+
+
+// FUNCTION: This extracts the main course id //
+// PARAMETERS: A url                          //
+// Returns: the Main Course id                //
 const getMainCourseId = (url) => {
     let parts = url.split("/");
     return parts[4]; // Adjust index based on URL structure
 };
 
-// Function to get the course ID from a URL, if applicable
+
+// FUNCTION: this is to get the course ID from a URL, if the url incluedes byui.instructure and not REFERENCE //
+// PARAMETERS: url                                                                                            //
+// RETURNS: Course code ID                                                                                    //
 function getCoursesId(url) {
     let parts = url.split("/");
     if (url.includes("byui.instructure") && !url.includes("REFERENCE$")) {
@@ -213,11 +237,16 @@ function getCoursesId(url) {
     }
 }
 
-// Function to fetch the status code of a given URL
+
+// FUNCTION: is used to fetch the status code of a given URL //
+// PARAMETER: url                                            //
+// RETURNS: url, status code, response url                   //
+//          if error: url, status, error                     //
 async function fetchStatusCode(url) {
     try {
-        const response = await fetch(url, {mode: 'no-cors'});
-        return { url, status: response.status };
+        const response = await fetch(url/*,{mode: 'no-cors'}*/);
+        console.log(response.url)
+        return { url, status: response.status, responseUrl: response.url};
     } catch (error) {
         console.log("error fetching", url, error);
         return { url, status: "Error", error: error };
@@ -230,31 +259,70 @@ async function processUrls(urls, mainCourseID) {
     const results = await Promise.all(fetchPromises);
     let arrayOfReasons = [];
 
+    function logAndAddReason (url, coursesId, status, responseURL, reason){
+      console.log(`URL: ${url}, Course ID: ${coursesId}, Status Code: ${status}, Response Url:${responseURL} ,Possible Reason: ${reason}`)
+      arrayOfReasons.push(`Possible Reason: ${reason}`)
+    };
+
+    function normalizeUrl(url){
+      return url.replace(/([^:]\/)\/+/g, "$1");
+    }
+
+
     results.forEach(result => {
         const coursesId = getCoursesId(result.url);
 
         if (coursesId !== null) {
-            if (coursesId != mainCourseID) {
-                console.log("URL:", result.url, "Course ID:", coursesId, "Status Code:", result.status, "Possible Reason: External Course Content");
-                arrayOfReasons.push("Possible Reason: External Course Content");
+            if (coursesId.length < 6) {
+                logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Hidden Link");
+                
+            } else if(coursesId != mainCourseID && !result.url.includes("REFERENCE")) {
+                logAndAddReason(result.url,coursesId,result.status,result.responseUrl,"From External Course")
+            
+            } else if (result.status === 200 && normalizeUrl(result.responseUrl).includes(normalizeUrl(result.url)) && result.responseUrl.includes("edit") ) {
+                logAndAddReason(result.url,coursesId,result.status,result.responseUrl,"Page Doesn't Exist (Canvas) - Deleted Course Content")
             } else {
-                console.log("URL:", result.url, "Course ID:", coursesId, "Status Code:", result.status, "Possible Reason: Broken Link");
-                arrayOfReasons.push("Possible Reason: Broken Link");
+                logAndAddReason(result.url,coursesId,result.status,result.responseUrl,"Uncertain")
             }
         } else {
-            if (result.status === 200 && !result.url.includes("byui.instructure")) {
-                console.log("URL:", result.url, "Course ID:", coursesId, "Status Code:", result.status, "Possible Reason: False Positive");
-                arrayOfReasons.push("Possible Reason: False Positive");
-            } else if (result.status === 404) {
-                console.log("URL:", result.url, "Course ID:", coursesId, "Status Code:", result.status, "Possible Reason: Page Not Found");
-                arrayOfReasons.push("Possible Reason: Page Not Found");
-            } else {
-                console.log("URL:", result.url, "Status Code:", result.status, "Possible Reason: Broken Link");
-                arrayOfReasons.push("Possible Reason: Broken Link");
-            }
-        }
+          // Specific checks for false positives and page not found
+          if((result.status === 200 && result.url.includes("content.byui.edu/")) 
+              ){
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Equella");
+          } 
+          
+          else if((!result.url.includes("byui.instructure")) && 
+                    result.url.includes("link.gale.com")){
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Library Resource");
+          } 
+          
+          else if ((result.status === 200 && !result.url.includes("byui.instructure")) || 
+                      result.url.includes("byui.edu/media") ||  
+                      result.status === 307) {
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "From External Resourse");
+          
+          } 
+          
+          else if(result.url.includes("preview")){
+              logAndAddReason(result.url,coursesId,result.status,result.responseUrl,"Image")
 
-    });
+          } 
+          
+          else if (result.status === 404 || result.status === 410) {
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Page Not Found");
+
+          } 
+          
+          else if(result.status == "Error" && result.responseUrl == undefined){
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Site Can't Be reached");
+
+          } 
+          
+          else {
+              logAndAddReason(result.url, coursesId, result.status,result.responseUrl, "Uncertain");
+          }
+      }
+  });
 
     console.log(arrayOfReasons);
   /****************************************************************/
