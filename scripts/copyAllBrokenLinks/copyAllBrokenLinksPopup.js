@@ -3,12 +3,14 @@
 //uses the populateData function
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.local.get(['brokenLinksPageUrls', 'brokenLinksURLS', 'brokenLinksTitles', 'currentUrl'], function(result) {
+    const array = result.brokenLinksTitles;
+    const length = array.length;
     populateData(result.brokenLinksTitles, result.brokenLinksPageUrls, result.brokenLinksURLS,result.currentUrl),
     populateReasons(result.brokenLinksURLS)
+    populateCourseNames(length);
   });
+  
 });
-
-
 
 //takes all of the arrays as a parameter and cleans them up and stores each of them to 
 //a new array 
@@ -351,7 +353,47 @@ async function processUrls(urls, mainCourseID) {
 }
 
   
+function populateCourseNames(length){
+  courseNames=[];
+  console.log("the populate Course Names Function is being called");
+  chrome.storage.local.get(['courseName'],(result)=>{
+    if(result.courseName){
+      const courseName = result.courseName;
 
+  /************************************************************************/
+  /*** Course Name Text Area ***/
+
+      for (let i = 0; i < length; i++){
+        courseNames.push(courseName)
+      }
+
+      let courseNameTextArea = document.getElementById('course_name');
+      courseNameTextArea.value = courseNames.join('\n');
+
+  /************************************************************************/
+
+  /************************************************************************/    
+  /*** Course Names Copy Button ***/
+
+      let courseNamesCopyButton = document.getElementById('copyCourseNameButton');
+      
+      function copyCourseNames(){
+        courseNameTextArea.select();
+        navigator.clipboard.writeText(courseNameTextArea.value);
+      }
+
+      courseNamesCopyButton.addEventListener('click',copyCourseNames);
+      
+  /************************************************************************/
+
+
+
+
+    } else {
+      console.log("ERROR: Course name not found");
+    }
+  });
+}
 
 
 

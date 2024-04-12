@@ -27,12 +27,15 @@ function scrape() {
     
     let arrayOfLinkTitles = selectAllTitles();
 
-    if (arrayOfPageUrls && arrayOfBrokenLinks && arrayOfLinkTitles){
+    let courseName = selectCourseName();
+
+    if (arrayOfPageUrls && arrayOfBrokenLinks && arrayOfLinkTitles && courseName){
         chrome.runtime.sendMessage({
           action: "sendArraysToBackground", 
           array1:arrayOfPageUrls, 
           array2:arrayOfBrokenLinks, 
-          array3:arrayOfLinkTitles});
+          array3:arrayOfLinkTitles,
+          course:courseName});
     }
 }
 
@@ -58,6 +61,29 @@ function scrape() {
  *  Stores all of broken link titles, from the affected URL, into an Array.
  * 
 ***/
+
+function selectCourseName(){
+
+    let courseNameObj = document.getElementsByClassName('ellipsible');
+    let fullCourseName = courseNameObj[1].innerText
+    function getCourseName(fullCourseName){
+        const typeBlock = ' (Block)'
+        const regex = /\b\w+\s\d+\w?\b/;
+        if (fullCourseName.includes('Block')){
+            const match = fullCourseName.match(regex);
+            const courseName = match[0] + typeBlock;
+            return courseName
+        }
+        const match = fullCourseName.match(regex);
+        return match[0];
+    }
+
+    let courseName = getCourseName(fullCourseName);
+
+    return courseName;
+}
+
+
 
 
 function selectHeaderHREFs(){

@@ -36,19 +36,22 @@ section{
     height:100%;
 }
 
+#copyCourseNameButton{
+    margin-left: 2%;
+}
 
 #copyLinkTextButton{
-    margin-left: 7%;
+    margin-left: 4%;
 }
 
 #copyPageUrlsButton{
     margin-left: 5%;
-    margin-right:5%;
+    margin-right: 3%;
 }
 
 #copyBrokenLinksButton{
     margin-right: 2%;
-    margin-left: 2%;
+    margin-left: 4%;
 }
 
 #copyBrokenReasonsButton{
@@ -106,7 +109,7 @@ button:active{
     height:auto;
 }
 
-.link_text,.page_urls,.broken_links,.broken_reason{
+.link_text,.page_urls,.broken_links,.broken_reason,.course_name{
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -138,6 +141,10 @@ button:active{
 }
 
 .link_text{
+    background-color: rgb(47, 47, 202);
+}
+
+.course_name{
     background-color: rgb(47, 47, 202);
 }
 

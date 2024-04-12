@@ -53,11 +53,13 @@ export function copyAllBrokenLinks () {
             let PageUrls = request.array1;
             let BrokenLinks = request.array2;
             let Titles = request.array3;
+            let Course = request.course;
 
             chrome.storage.local.set({
                 brokenLinksPageUrls: PageUrls,
                 brokenLinksURLS: BrokenLinks,
-                brokenLinksTitles: Titles
+                brokenLinksTitles: Titles,
+                courseName:Course
             }, function() {
                 chrome.windows.create({
                     type: 'popup',
