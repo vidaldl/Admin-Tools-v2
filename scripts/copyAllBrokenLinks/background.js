@@ -66,8 +66,8 @@ export function copyAllBrokenLinks () {
                 chrome.windows.create({
                     type: 'popup',
                     url: './scripts/copyAllBrokenLinks/copyAllBrokenLinksPopup.html',
-                    width: 630,
-                    height: 325
+                    width: 980,
+                    height: 470
                 });
             });
 

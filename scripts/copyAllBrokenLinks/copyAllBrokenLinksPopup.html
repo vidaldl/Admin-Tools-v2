@@ -1,106 +1,74 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" type="text/css" href="copyAllBrokenLinksPopup.css">
-  <script src="copyAllBrokenLinksPopup.js"></script>
-</head>
-<title>Copy All Broken Links</title>
-<body>
-    <div class="popup-content">
-        <header>
-            <h2 class="course_name">
-                Course     
-            </h2>
-            <h2 class="broken_reason">
-                Reason
-            </h2>
-            <h2 class="broken_link_location">
-                Location     
-            </h2>
-            <h2 class="link_text">
-                Link Titles
-            </h2>
-            <h2 class="page_urls">
-                Page Urls
-            </h2>
-            <h2 class="broken_links">
-                Broken Links
-            </h2>
-            
-        </header>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Link Validator Tool</title>
+    <link href="copyAllBrokenLinksPopup.css" rel="stylesheet" type="text/css">
+    <script src="copyAllBrokenLinksPopup.js"></script>
+  </head>
+  <body>
+    <div class="header">
+        <h2> Link Validator Tool</h2>
+    </div>
 
-        <main>
-            <textarea class = "textarea" id="course_name">
+    <div class="mainContainer">
+        <div class="card">
+            <h2 class="course_name">Course</h2>
+            <textarea class="textarea" id="course_name">
                 &nbsp;
             </textarea>
-
-            <textarea class = "textarea" id = "broken_reason">
-                &nbsp;
-            </textarea>
-
-            <textarea class = "textarea" id = "broken_location">
-                &nbsp;
-            </textarea>
-
-            <textarea class = "textarea" id="link_text">
-                &nbsp;
-            </textarea>
-
-            <textarea class = "textarea" id="page_urls">
-                &nbsp;
-            </textarea>
-
-            <textarea class = "textarea" id = "broken_links">
-                &nbsp;
-            </textarea>
-                
-            
-
-        </main>
-
-        <section>
-            <button class="buttons" id="copyCourseNameButton"> 
+            <button class="buttons" id="copyCourseNameButton">
                 Copy Course Name
             </button>
-
-            <button class="buttons" id="copyBrokenReasonsButton"> 
-                Copy Reasons
-            </button>
-
-            <button class="buttons" id="copyBrokenLocationsButton"> 
-                Copy Locations
-            </button>
-            
-            <button class="buttons" id="copyLinkTextButton"> 
-                Copy titles
-            </button>
-
-            <button class="buttons" id="copyPageUrlsButton"> 
-                Copy Urls
-            </button>
-
-            <button class="buttons" id="copyBrokenLinksButton"> 
-                Copy links
-            </button>
-
-           
-
-            
-        
-        </section>
-
-        <div class="buttons_all">
-            <button class="buttons" id="copyAllButton">
-                Copy All
-            </button>
-            <!-- optional setting -->
-            <!-- <button class="buttons" id="clearAllButton">
-                Clear All
-            </button> -->
         </div>
     
+        <div class="card">
+            <h2 class="broken_reason">Reason</h2>
+            <textarea class="textarea" id="broken_reason">
+                &nbsp;
+            </textarea>
+            <button class="buttons" id="copyBrokenReasonsButton">Copy Reasons</button>
+        </div>
+    
+        <div class="card">
+            <h2 class="broken_link_location">Location</h2>
+            <textarea class="textarea" id="broken_location">
+                &nbsp;
+            </textarea>
+            <button class="buttons" id="copyBrokenLocationsButton">
+                Copy Locations
+            </button>
+        </div>
+    
+        <div class="card">
+            <h2 class="link_text">Link Titles</h2>
+            <textarea class="textarea" id="link_text">
+                &nbsp;
+            </textarea>
+            <button class="buttons" id="copyLinkTextButton">Copy Titles</button>
+        </div>
+    
+        <div class="card" >
+            <h2 class="page_urls">Page Urls</h2>
+            <textarea class="textarea" id="page_urls">
+                &nbsp;
+            </textarea>
+            <button class="buttons" id="copyPageUrlsButton">Copy Urls</button>
+        </div>
+    
+        <div class="card">
+            <h2 class="broken_links">Broken Links</h2>
+            <textarea class="textarea" id="broken_links">
+                &nbsp;
+            </textarea>
+            <button class="buttons" id="copyBrokenLinksButton">Copy Links</button>
+        </div>
+        
     </div>
-  
-  
-</body>
+    <div class="buttons_all" >
+        <button class="copy-all-button" id="copyAllButton">Copy All</button>
+    </div>
+    
+  </body>
 </html>
