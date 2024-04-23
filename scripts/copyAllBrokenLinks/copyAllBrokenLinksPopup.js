@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         result.brokenLinksURLS,
         result.currentUrl
       ),
-        populateReasons(result.brokenLinksURLS);
+      populateReasons(result.brokenLinksURLS);
       populateCourseNames(length);
       populateLocations();
     }
@@ -88,9 +88,13 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
   /****************************************************************/
   /***Text areas***/
   //elements of all of the text areas
+  let coursesTextArea = document.getElementById("course_name");
+  let reasonTextArea = document.getElementById("broken_reason");
+  let locationTextArea = document.getElementById("broken_locations");
   let titlesTextArea = document.getElementById("link_text");
   let linkTextTextarea = document.getElementById("page_urls");
   let brokenLinkTextArea = document.getElementById("broken_links");
+  
 
   //turns all the arrays to a string
   titlesTextArea.value = Titles.join("\n");
@@ -140,23 +144,39 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
   let copyAllButton = document.getElementById("copyAllButton");
 
   function CopyAll() {
-    let titleText = titlesTextArea.value;
-    let linkText = linkTextTextarea.value;
-    let brokenLinkText = brokenLinkTextArea.value;
+    const coursesTextArea = document.getElementById("course_name");
+    const reasonTextArea = document.getElementById("broken_reason");
+    const locationTextArea = document.getElementById("broken_location");
+    const titlesTextArea = document.getElementById("link_text");
+    const linkTextTextarea = document.getElementById("page_urls");
+    const brokenLinkTextArea = document.getElementById("broken_links");
 
-    let titles = titleText.split("\n");
-    let links = linkText.split("\n");
-    let brokenLinks = brokenLinkText.split("\n");
+    const courses = coursesTextArea.value.split('\n');
+    const reasons = reasonTextArea.value.split('\n');
+    const locations = locationTextArea.value.split('\n');
+    const titles = titlesTextArea.value.split('\n');
+    const pageUrls = linkTextTextarea.value.split('\n');
+    const brokenLinks = brokenLinkTextArea.value.split('\n');
+
     let combinedText = "";
-
-    let rows = titles.length;
-
-    for (let i = 0; i < rows; i++) {
-      combinedText += `${titles[i]}\t${links[i]}\t${brokenLinks[i]}\n`;
-    }
-
-    navigator.clipboard.writeText(combinedText);
+    for (let i = 0; i < courses.length; i++) {
+      combinedText += [
+        courses[i],
+        "", // Status is missing in the provided JavaScript code. Place an empty string here as a placeholder
+        reasons[i],
+        locations[i],
+        titles[i],
+        pageUrls[i],
+        brokenLinks[i],
+      ].join("\t") + "\n"; // Join with tabs and add a newline at the end
   }
+
+  navigator.clipboard.writeText(combinedText).then(function() {
+    console.log('Copying to clipboard was successful!');
+  }, function(err) {
+    console.error('Could not copy text: ', err);
+  });
+}
 
   copyAllButton.addEventListener("click", CopyAll);
   /**************************************************************************/
