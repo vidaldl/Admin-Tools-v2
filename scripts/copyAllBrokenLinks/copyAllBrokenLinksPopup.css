@@ -97,3 +97,7 @@ h2{
 .copy-all-button:hover {
     background-color: #0056b3; /* Darker shade on hover for buttons */
 }
+
+.copy-all-button:active{
+    background-color: #007bff;
+}

@@ -289,7 +289,7 @@ function populateReasons(BrokenLinkArray2) {
     }
 
     function normalizeUrl(url) {
-      return url.replace(/([^:]\/)\/+/g, "$1");
+      return url.replace(/([^:]\/)\/+/g, "$1").split('#')[0];
     }
 
     results.forEach((result) => {
@@ -319,6 +319,28 @@ function populateReasons(BrokenLinkArray2) {
           result.status === 200 &&
           normalizeUrl(result.responseUrl).includes(normalizeUrl(result.url)) &&
           result.responseUrl.includes("edit")
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Doesn't Exist (Canvas) - Deleted Course Content"
+          );
+        } else if (
+          result.status === 400  &&
+          normalizeUrl(result.responseUrl) === normalizeUrl(result.url)
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Doesn't Exist (Canvas) - Deleted Course Content"
+          );
+        } else if (
+          result.status === 200  &&
+          normalizeUrl(result.url).includes(normalizeUrl(result.responseUrl))
         ) {
           logAndAddReason(
             result.url,
