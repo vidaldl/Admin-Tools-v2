@@ -36,7 +36,12 @@ export function copyAllBrokenLinks () {
                     files: ['./scripts/copyAllBrokenLinks/contentScript.js']
                 });
             });
+
+                chrome.storage.local.set({'currentUrl': tab.url}, function() {
+                console.log('URL is stored in chrome.storage.local');
+            });
         }
+    
     });
 
 
@@ -48,22 +53,25 @@ export function copyAllBrokenLinks () {
             let PageUrls = request.array1;
             let BrokenLinks = request.array2;
             let Titles = request.array3;
+            let Course = request.course;
+            let BrokenLinkLocations = request.locations;
 
             chrome.storage.local.set({
                 brokenLinksPageUrls: PageUrls,
                 brokenLinksURLS: BrokenLinks,
-                brokenLinksTitles: Titles
+                brokenLinksTitles: Titles,
+                courseName:Course,
+                brokenLinksLocations: BrokenLinkLocations
             }, function() {
                 chrome.windows.create({
                     type: 'popup',
                     url: './scripts/copyAllBrokenLinks/copyAllBrokenLinksPopup.html',
-                    width: 630,
-                    height: 325
+                    width: 980,
+                    height: 470
                 });
             });
 
         }
     });
-
 
 }
