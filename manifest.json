@@ -9,11 +9,7 @@
     "128": "images/icons/icon128.png"
   },
   "permissions": ["storage", "activeTab","contextMenus","activeTab","scripting","windows"],
-  "host_permissions": [
-    "https://*.instructure.com/*",
-    "https://*/*",
-    "http://*/*"
-  ],
+  "host_permissions": ["https://*.instructure.com/*"],
   "action": {
     "default_icon": {
       "48": "images/icons/icon48.png"
