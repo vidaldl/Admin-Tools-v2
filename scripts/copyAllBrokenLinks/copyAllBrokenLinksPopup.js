@@ -416,7 +416,7 @@ function populateReasons(BrokenLinkArray2) {
             coursesId,
             result.status,
             result.responseUrl,
-            "Site Can't Be reached"
+            "Site Can't Be Reached"
           );
         } else {
           logAndAddReason(

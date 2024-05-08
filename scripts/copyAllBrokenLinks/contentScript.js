@@ -131,7 +131,7 @@ function selectBrokenLinkLocation() {
       }
     } else if (div["Page"].includes("Course Homepage")) {
       for (i = 0; i < amountOfLinks; i++) {
-        locations.push("Course Hompage");
+        locations.push("Course Homepage");
       }
     } else if (div["Page"].includes("Instructor Resource")) {
       for (i = 0; i < amountOfLinks; i++) {
