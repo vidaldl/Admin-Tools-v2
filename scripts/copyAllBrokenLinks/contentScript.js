@@ -135,7 +135,7 @@ function selectBrokenLinkLocation() {
       }
     } else if (div["Page"].includes("Instructor Resource")) {
       for (i = 0; i < amountOfLinks; i++) {
-        locations.push("Instructor Resource");
+        locations.push("Instructor Resources");
       }
     } else if (div["Page"].includes("Textbook Information")) {
       for (i = 0; i < amountOfLinks; i++) {
@@ -242,17 +242,21 @@ function selectHeaderHREFs() {
 
   let linksAmmount = Array.from(divs).map((div) => {
     let links = div.querySelectorAll("a");
+    console.log("Links",links)  
     let count = links.length - 1;
+    console.log("Count",count)
 
     if (count > 1) {
-      let headings = document.querySelector(".result h2 > a");
-      let link = headings.getAttribute("href");
+      let headings = links[0];
+      console.log("Headings",headings)  
+      let link = headings.href
+      console.log("Link",link)  
 
       for (let i = 0; i <= count - 1; i++) {
         PageUrlArray.push(link);
       }
     } else {
-      PageUrlArray.push(links[0].getAttribute("href"));
+      PageUrlArray.push(links[0].href);
     }
   });
 

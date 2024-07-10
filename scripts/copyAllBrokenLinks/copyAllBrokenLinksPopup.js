@@ -45,7 +45,7 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
   let prefix = "https://byui.instructure.com";
 
   //adds the prefix to all of the page url
-  let PageUrlArray = PageUrlArray1.map((url) => prefix + url);
+  let PageUrlArray = PageUrlArray1.map((url) => url);
   /***********************************************************/
 
   /***********************************************************************************************************/
@@ -283,9 +283,9 @@ function populateReasons(BrokenLinkArray2) {
 
     function logAndAddReason(url, coursesId, status, responseURL, reason) {
       console.log(
-        `URL: ${url}, Course ID: ${coursesId}, Status Code: ${status}, Response Url:${responseURL} ,Possible Reason: ${reason}`
+        `URL: ${url}, Course ID: ${coursesId}, Status Code: ${status}, Response Url:${responseURL} ,${reason}`
       );
-      arrayOfReasons.push(`Possible Reason: ${reason}`);
+      arrayOfReasons.push(reason);
     }
 
     function normalizeUrl(url) {
@@ -389,7 +389,7 @@ function populateReasons(BrokenLinkArray2) {
             coursesId,
             result.status,
             result.responseUrl,
-            "From External Resourse"
+            "From External Resource"
           );
         } else if (result.url.includes("preview")) {
           logAndAddReason(
