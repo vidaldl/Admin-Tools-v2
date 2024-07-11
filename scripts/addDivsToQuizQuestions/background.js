@@ -4,7 +4,7 @@ export function addDivsToQuestions() {
     // Create a context menu
     chrome.contextMenus.create({
       id: "unfiled-questions",
-      title: "Fix Divs for all Questions",
+      title: "Fix Divs for All Questions",
       contexts: ["page"],
       documentUrlPatterns: [
         "https://*.instructure.com/courses/*/question_banks/*",
