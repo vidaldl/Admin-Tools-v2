@@ -32,8 +32,9 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   let prefix = "https://byui.instructure.com";
   
   //adds the prefix to all of the page url
-  let PageUrlArray = PageUrlArray1.map(url => prefix + url);
-/***********************************************************/
+
+  let PageUrlArray = PageUrlArray1.map((url) => url);
+  /***********************************************************/
 
 
 /***********************************************************************************************************/
@@ -151,6 +152,324 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
 
   // clearAllButton.addEventListener("click", ClearAll);
 }
+
+
+//FUNCTION: takes all the urls, cleans them//
+//PARAMETERS: the Broken Link array
+//RETURNS a list of broken link urls       //
+
+function populateReasons(BrokenLinkArray2) {
+  chrome.storage.local.get(["currentUrl"], function (result) {
+    if (result.currentUrl) {
+      let storedCurrentUrl = result.currentUrl;
+
+      /***Cleans Array of Broken links***/
+      let prefix2 = "https://byui.instructure.com/";
+      let prefix3 = `https://byui.instructure.com/courses/${result.currentUrl}/`;
+
+      // urls with these prases require the prefix to be added maunualy
+      let phrase1 = "$CANVAS_COURSE_REFERENCE$";
+      let phrase2 = "/courses";
+      let phrase3 = "$CANVAS_OBJECT_REFERENCE$";
+      let phrase4 = "media_objects_iframe";
+      let phrase5 = "%24CANVAS_OBJECT_REFERENCE%24";
+      //console.log("Retrieved URL from Chrome.storage.local", storedCurrentUrl);
+
+      //Retreives a cleaned array of Broken links
+      let BrokenLinkArrayForReasons = BrokenLinkArray2.map((url) => {
+        if (
+          url.includes(phrase1) ||
+          url.includes(phrase2) ||
+          url.includes(phrase3) ||
+          url.includes(phrase4)
+        ) {
+          return prefix2 + url;
+        } else if (url.includes(phrase5)) {
+          return prefix3 + url;
+        }
+        return url;
+      });
+
+      // Use storedCurrentUrl as the course URL to get the main course ID
+      const mainCourseID = getMainCourseId(storedCurrentUrl);
+
+      // Assuming BrokenLinkArrayForReasons is already defined and populated
+      // Process the links stored in BrokenLinkArrayForReasons
+      processUrls(BrokenLinkArrayForReasons, mainCourseID);
+    }
+  });
+
+  // FUNCTION: This extracts the main course id //
+  // PARAMETERS: A url                          //
+  // Returns: the Main Course id                //
+  const getMainCourseId = (url) => {
+    let parts = url.split("/");
+    return parts[4]; // Adjust index based on URL structure
+  };
+
+  // FUNCTION: this is to get the course ID from a URL, if the url incluedes byui.instructure and not REFERENCE //
+  // PARAMETERS: url                                                                                            //
+  // RETURNS: Course code ID                                                                                    //
+  function getCoursesId(url) {
+    let parts = url.split("/");
+    if (url.includes("byui.instructure") && !url.includes("REFERENCE$")) {
+      return parts[5]; // Adjust index based on URL structure
+    } else {
+      return null;
+    }
+  }
+
+  // FUNCTION: is used to fetch the status code of a given URL //
+  // PARAMETER: url                                            //
+  // RETURNS: url, status code, response url                   //
+  //          if error: url, status, error                     //
+  async function fetchStatusCode(url) {
+    try {
+      const response = await fetch(url /*,{mode: 'no-cors'}*/);
+      //console.log(response.url)
+      return { url, status: response.status, responseUrl: response.url };
+    } catch (error) {
+      //console.log("error fetching", url, error);
+      return { url, status: "Error", error: error };
+    }
+  }
+
+  // Function to process each URL in the given array and log relevant information
+  async function processUrls(urls, mainCourseID) {
+    const fetchPromises = urls.map((url) => fetchStatusCode(url));
+    const results = await Promise.all(fetchPromises);
+    let arrayOfReasons = [];
+
+    function logAndAddReason(url, coursesId, status, responseURL, reason) {
+      console.log(
+        `URL: ${url}, Course ID: ${coursesId}, Status Code: ${status}, Response Url:${responseURL} ,${reason}`
+      );
+      arrayOfReasons.push(reason);
+    }
+
+    function normalizeUrl(url) {
+      return url.replace(/([^:]\/)\/+/g, "$1").split('#')[0];
+    }
+
+    results.forEach((result) => {
+      const coursesId = getCoursesId(result.url);
+
+      if (coursesId !== null) {
+        if (coursesId.length < 6) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Hidden Link"
+          );
+        } else if (
+          coursesId != mainCourseID &&
+          !result.url.includes("REFERENCE")
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "From External Course"
+          );
+        } else if (
+          result.status === 200 &&
+          normalizeUrl(result.responseUrl).includes(normalizeUrl(result.url)) &&
+          result.responseUrl.includes("edit")
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Doesn't Exist (Canvas) - Deleted Course Content"
+          );
+        } else if (
+          result.status === 400  &&
+          normalizeUrl(result.responseUrl) === normalizeUrl(result.url)
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Doesn't Exist (Canvas) - Deleted Course Content"
+          );
+        } else if (
+          result.status === 200  &&
+          normalizeUrl(result.url).includes(normalizeUrl(result.responseUrl))
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Doesn't Exist (Canvas) - Deleted Course Content"
+          );
+        } else {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Uncertain"
+          );
+        }
+      } else {
+        // Specific checks for false positives and page not found
+        if (result.status === 200 && result.url.includes("content.byui.edu/")) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Equella"
+          );
+        } else if (
+          !result.url.includes("byui.instructure") &&
+          result.url.includes("link.gale.com")
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Library Resource"
+          );
+        } else if (
+          (result.status === 200 && !result.url.includes("byui.instructure")) ||
+          result.url.includes("byui.edu/media") ||
+          result.status === 307
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "From External Resource"
+          );
+        } else if (result.url.includes("preview")) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Image"
+          );
+        } else if (result.status === 404 || result.status === 410) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Page Not Found"
+          );
+        } else if (
+          result.status == "Error" &&
+          result.responseUrl == undefined
+        ) {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Site Can't Be Reached"
+          );
+        } else {
+          logAndAddReason(
+            result.url,
+            coursesId,
+            result.status,
+            result.responseUrl,
+            "Uncertain"
+          );
+        }
+      }
+    });
+
+    //console.log(arrayOfReasons);
+    /****************************************************************/
+    /*** Reasons Text areas***/
+
+    let reasonsTextArea = document.getElementById("broken_reason");
+    reasonsTextArea.value = arrayOfReasons.join("\n");
+    /****************************************************************/
+
+    /****************************************************************/
+    /*** Reasons Text Copy Button***/
+
+    let reasonsCopyButton = document.getElementById("copyBrokenReasonsButton");
+
+    function copyReasons() {
+      reasonsTextArea.select();
+      navigator.clipboard.writeText(reasonsTextArea.value);
+    }
+
+    reasonsCopyButton.addEventListener("click", copyReasons);
+
+    /****************************************************************/
+  }
+}
+
+function populateCourseNames(length) {
+  courseNames = [];
+  //console.log("the populate Course Names Function is being called");
+  chrome.storage.local.get(["courseName"], (result) => {
+    if (result.courseName) {
+      const courseName = result.courseName;
+
+      /************************************************************************/
+      /*** Course Name Text Area ***/
+
+      for (let i = 0; i < length; i++) {
+        courseNames.push(courseName);
+      }
+
+      let courseNameTextArea = document.getElementById("course_name");
+      courseNameTextArea.value = courseNames.join("\n");
+
+      /************************************************************************/
+
+      /************************************************************************/
+      /*** Course Names Copy Button ***/
+
+      let courseNamesCopyButton = document.getElementById(
+        "copyCourseNameButton"
+      );
+
+      function copyCourseNames() {
+        courseNameTextArea.select();
+        navigator.clipboard.writeText(courseNameTextArea.value);
+      }
+
+      courseNamesCopyButton.addEventListener("click", copyCourseNames);
+
+      /************************************************************************/
+    } else {
+      console.log("ERROR: Course name not found");
+    }
+  });
+}
+
+function populateLocations() {
+  console.log("the populate Locations Function is being called");
+  chrome.storage.local.get(["brokenLinksLocations"], (result) => {
+    if (result.brokenLinksLocations) {
+      const locations = result.brokenLinksLocations;
+
+      let locationsTextArea = document.getElementById("broken_location");
+      locationsTextArea.value = locations.join("\n");
+
+      let locationsCopyButton = document.getElementById(
+        "copyBrokenLocationsButton"
+      );
+
+      function copyLocations() {
+        locationsTextArea.select();
+        navigator.clipboard.writeText(locationsTextArea.value);
+      }
 
 
   

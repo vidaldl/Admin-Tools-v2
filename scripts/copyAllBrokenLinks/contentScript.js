@@ -62,17 +62,173 @@ function scrape() {
 
 function selectHeaderHREFs(){
 
+
+
+
+
+
+function selectBrokenLinkLocation() {
+  const locations = [];
+
+  const divObjs = {};
+
+  const div = document.querySelectorAll("div.result");
+
+  div.forEach((node, index) => {
+    const brokenLinks = [];
+    const brokenLinksText = [];
+    const page = node.querySelector("h2").innerText;
+    const pageLink = node.querySelector("h2 a").href;
+
+    const links = node.querySelectorAll("ul > li > a");
+
+    links.forEach((link) => {
+      brokenLinks.push(link.href);
+      brokenLinksText.push(link.innerText);
+    });
+
+    divObjs[index] = {
+      Page: page,
+      "Page Link": pageLink,
+      "Broken Link Text": brokenLinksText,
+      "Broken Link URL": brokenLinks,
+    };
+  });
+
+  console.log(divObjs);
+
+  Object.values(divObjs).forEach((div) => {
+    const amountOfLinks = div["Broken Link Text"].length;
+    console.log(amountOfLinks);
+    if (div["Page"].includes("Syllabus")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Syllabus");
+      }
+    } else if (div["Page"].includes("Course Homepage")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Course Homepage");
+      }
+    } else if (div["Page"].includes("Instructor Resource")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Instructor Resources");
+      }
+    } else if (div["Page"].includes("Textbook Information")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Textbook Information");
+      }
+    } else if (div["Page"].includes("Teaching Notes")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Teaching Notes");
+      }
+    } else if (div["Page"].includes("Student Resources")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Student Resources");
+      }
+    } else if (div["Page"].includes("W01")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 01");
+      }
+    } else if (div["Page"].includes("W02")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 02");
+      }
+    } else if (div["Page"].includes("W03")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 03");
+      }
+    } else if (div["Page"].includes("W04")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 04");
+      }
+    } else if (div["Page"].includes("W05")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 05");
+      }
+    } else if (div["Page"].includes("W06")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 06");
+      }
+    } else if (div["Page"].includes("W07")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 07");
+      }
+    } else if (div["Page"].includes("W08")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 08");
+      }
+    } else if (div["Page"].includes("W09")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 09");
+      }
+    } else if (div["Page"].includes("W10")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 10");
+      }
+    } else if (div["Page"].includes("W11")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 12");
+      }
+    } else if (div["Page"].includes("W12")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 12");
+      }
+    } else if (div["Page"].includes("W13")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 13");
+      }
+    } else if (div["Page"].includes("W14")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Week 14");
+      }
+    } else if (div["Page Link"].includes("pages")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Pages");
+      }
+    } else if (div["Page Link"].includes("quizzes")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Question Bank");
+      }
+    } else if (div["Page Link"].includes("question_banks")) {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Unfiled QB");
+      }
+    } else {
+      for (i = 0; i < amountOfLinks; i++) {
+        locations.push("Other");
+      }
+    }
+  });
+
+  return locations;
+}
+
+
+
+
+
+
+
+
+
+function selectHeaderHREFs() {
+
   let PageUrlArray = [];
 
   let divs = document.querySelectorAll('div.result');
 
-  let linksAmmount = Array.from(divs).map(div => {
-      let links = div.querySelectorAll('a'); 
-      let count = links.length - 1;
 
-      if (count > 1){
-          let headings = document.querySelector('.result h2 > a');
-          let link = headings.getAttribute('href');
+  let linksAmmount = Array.from(divs).map((div) => {
+    let links = div.querySelectorAll("a");
+    console.log("Links",links)  
+    let count = links.length - 1;
+    console.log("Count",count)
+
+    if (count > 1) {
+      let headings = links[0];
+      console.log("Headings",headings)  
+      let link = headings.href
+      console.log("Link",link)  
+
 
           for (let i = 0; i <= count - 1; i++){
               PageUrlArray.push(link);
@@ -82,6 +238,11 @@ function selectHeaderHREFs(){
       {
           PageUrlArray.push(links[0].getAttribute("href"));
       }
+
+    } else {
+      PageUrlArray.push(links[0].href);
+    }
+
   });
 
   return PageUrlArray;

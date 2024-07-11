@@ -8,8 +8,14 @@
     "48": "images/icons/icon48.png",
     "128": "images/icons/icon128.png"
   },
-  "permissions": ["storage", "activeTab","contextMenus","activeTab","scripting","windows"],
-  "host_permissions": ["https://*.instructure.com/*"],
+
+  "permissions": ["tabs","storage", "activeTab","contextMenus","activeTab","scripting","windows"],
+  "host_permissions": [
+    "https://*.instructure.com/*",
+    "https://*/*",
+    "http://*/*"
+  ],
+
   "action": {
     "default_icon": {
       "48": "images/icons/icon48.png"
@@ -109,6 +115,16 @@
         "js": [
             "scripts/selectAllFiles/contentScript.js"
         ]
+    },
+    {
+      "matches":[
+        "https://*.instructure.com/courses/*/question_banks/*"
+      ],
+      "js":[
+        "scripts/addDivsToQuizQuestions/contentScript.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
     }
 
     

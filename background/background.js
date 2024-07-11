@@ -1,5 +1,5 @@
 import { copyAllBrokenLinks } from '../scripts/copyAllBrokenLinks/background.js';
-
+import { addDivsToQuestions } from '../scripts/addDivsToQuizQuestions/background.js';
 
 
 /****
@@ -12,6 +12,7 @@ import { copyAllBrokenLinks } from '../scripts/copyAllBrokenLinks/background.js'
  * [canvas_instance]/course/[courseId]/link_validator
  *
  ****/
+ addDivsToQuestions();
  copyAllBrokenLinks();
 
 /********************************
