@@ -8,12 +8,14 @@
     "48": "images/icons/icon48.png",
     "128": "images/icons/icon128.png"
   },
+
   "permissions": ["tabs","storage", "activeTab","contextMenus","activeTab","scripting","windows"],
   "host_permissions": [
     "https://*.instructure.com/*",
     "https://*/*",
     "http://*/*"
   ],
+
   "action": {
     "default_icon": {
       "48": "images/icons/icon48.png"
