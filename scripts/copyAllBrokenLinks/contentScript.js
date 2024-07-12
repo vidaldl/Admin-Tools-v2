@@ -211,38 +211,26 @@ function selectBrokenLinkLocation() {
 
 
 function selectHeaderHREFs() {
-
   let PageUrlArray = [];
 
   let divs = document.querySelectorAll('div.result');
 
-
-  let linksAmmount = Array.from(divs).map((div) => {
+  Array.from(divs).forEach((div) => {
     let links = div.querySelectorAll("a");
-    console.log("Links",links)  
-    let count = links.length - 1;
-    console.log("Count",count)
+    console.log("Links", links);
 
-    if (count > 1) {
+    if (links.length > 1) {
       let headings = links[0];
-      console.log("Headings",headings)  
-      let link = headings.href
-      console.log("Link",link)  
+      console.log("Headings", headings);
+      let link = headings.href;
+      console.log("Link", link);
 
-
-          for (let i = 0; i <= count - 1; i++){
-              PageUrlArray.push(link);
-          }      
+      for (let i = 0; i < links.length; i++) {
+        PageUrlArray.push(link);
       }
-      else 
-      {
-          PageUrlArray.push(links[0].getAttribute("href"));
-      }
-
-    } else {
+    } else if (links.length === 1) {
       PageUrlArray.push(links[0].href);
     }
-
   });
 
   return PageUrlArray;
@@ -267,4 +255,5 @@ function selectAllTitles()
   let titlesArray = Array.from(titles).map(title => title.textContent);
 
   return titlesArray;
+}
 }
