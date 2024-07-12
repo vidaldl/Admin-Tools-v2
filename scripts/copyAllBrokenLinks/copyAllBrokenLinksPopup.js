@@ -471,5 +471,4 @@ function populateLocations() {
         navigator.clipboard.writeText(locationsTextArea.value);
       }
 
-
-  
+    }})}
