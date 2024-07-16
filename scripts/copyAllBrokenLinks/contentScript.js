@@ -1,13 +1,10 @@
-
-
 //calling the scrape function to start the process
 scrape();
-
 
 /****
  *
  * This function is to scrape the affected URL for the following.
- *      - The Title of all Broken Links on Page 
+ *      - The Title of all Broken Links on Page
  *      - The URL's of all Broken Links on the Page
  *      - The Page Location of all Broken Links on the Page
  *
@@ -20,47 +17,75 @@ scrape();
  *
  ****/
 function scrape() {
+  let arrayOfPageUrls = selectHeaderHREFs();
 
-    let arrayOfPageUrls = selectHeaderHREFs();
+  let arrayOfBrokenLinks = selectLinksHREFs();
 
-    let arrayOfBrokenLinks = selectLinksHREFs();
-    
-    let arrayOfLinkTitles = selectAllTitles();
+  let arrayOfLinkTitles = selectAllTitles();
 
-    if (arrayOfPageUrls && arrayOfBrokenLinks && arrayOfLinkTitles){
-        chrome.runtime.sendMessage({
-          action: "sendArraysToBackground", 
-          array1:arrayOfPageUrls, 
-          array2:arrayOfBrokenLinks, 
-          array3:arrayOfLinkTitles});
-    }
+  let courseName = selectCourseName();
+
+  let brokenLinkLocations = selectBrokenLinkLocation();
+
+  if (
+    arrayOfPageUrls &&
+    arrayOfBrokenLinks &&
+    arrayOfLinkTitles &&
+    courseName &&
+    brokenLinkLocations
+
+  ) {
+    chrome.runtime.sendMessage({
+      action: "sendArraysToBackground",
+      array1: arrayOfPageUrls,
+      array2: arrayOfBrokenLinks,
+      array3: arrayOfLinkTitles,
+      course: courseName,
+      locations: brokenLinkLocations
+    });
+  }
 }
 
-
-
-
 /***
- * 
- * 
+ *
+ *
  *  Utility Functions
  * -------------------
- * 
+ *
  *  selectHeaderHREF()
- *  Process: 
+ *  Process:
  *  Stores all of the page urls, from the affected URL, into an Array.
- * 
+ *
  *  selectLinksHREFs()
  *  Process:
  *  Stores all of the broken links, from the affected URL, into an Array.
- * 
+ *
  *  selectAllTitles()
- *  Process: 
+ *  Process:
  *  Stores all of broken link titles, from the affected URL, into an Array.
- * 
-***/
+ *
+ ***/
 
+function selectCourseName() {
+  let courseNameObj = document.getElementsByClassName("ellipsible");
+  let fullCourseName = courseNameObj[1].innerText;
+  function getCourseName(fullCourseName) {
+    const typeBlock = " (Block)";
+    const regex = /\b\w+\s\d+\w?\b/;
+    if (fullCourseName.includes("Block")) {
+      const match = fullCourseName.match(regex);
+      const courseName = match[0] + typeBlock;
+      return courseName;
+    }
+    const match = fullCourseName.match(regex);
+    return match[0];
+  }
 
-function selectHeaderHREFs(){
+  let courseName = getCourseName(fullCourseName);
+
+  return courseName;
+}
+
 
 
 
@@ -213,47 +238,45 @@ function selectBrokenLinkLocation() {
 function selectHeaderHREFs() {
   let PageUrlArray = [];
 
-  let divs = document.querySelectorAll('div.result');
+  let divs = document.querySelectorAll("div.result");
 
-  Array.from(divs).forEach((div) => {
+  let linksAmmount = Array.from(divs).map((div) => {
     let links = div.querySelectorAll("a");
-    console.log("Links", links);
+    console.log("Links",links)  
+    let count = links.length - 1;
+    console.log("Count",count)
 
-    if (links.length > 1) {
+    if (count > 1) {
       let headings = links[0];
-      console.log("Headings", headings);
-      let link = headings.href;
-      console.log("Link", link);
+      console.log("Headings",headings)  
+      let link = headings.href
+      console.log("Link",link)  
 
-      for (let i = 0; i < links.length; i++) {
+      for (let i = 0; i <= count - 1; i++) {
         PageUrlArray.push(link);
       }
-    } else if (links.length === 1) {
+    } else {
       PageUrlArray.push(links[0].href);
     }
   });
 
   return PageUrlArray;
-};
-
+}
 
 function selectLinksHREFs() {
-    // Select all <a> elements that are children of <h2> within .result
-    const links = document.querySelectorAll('.result ul > li > a');
+  // Select all <a> elements that are children of <h2> within .result
+  const links = document.querySelectorAll(".result ul > li > a");
 
-    // Map over the NodeList to extract the href attributes
-    const hrefs = Array.from(links).map(link => link.getAttribute('href'));
+  // Map over the NodeList to extract the href attributes
+  const hrefs = Array.from(links).map((link) => link.getAttribute("href"));
 
-    return hrefs;
+  return hrefs;
 }
 
+function selectAllTitles() {
+  const titles = document.querySelectorAll(".result ul > li > a");
 
-function selectAllTitles()
-{
-  const titles = document.querySelectorAll('.result ul > li > a');
-  
-  let titlesArray = Array.from(titles).map(title => title.textContent);
+  let titlesArray = Array.from(titles).map((title) => title.textContent);
 
   return titlesArray;
-}
 }
