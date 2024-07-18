@@ -1,144 +1,187 @@
-
 //gets the broken links that we previously stored in the local storage
 //uses the populateData function
-document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.local.get(['brokenLinksPageUrls', 'brokenLinksURLS', 'brokenLinksTitles'], function(result) {
-    populateData(result.brokenLinksTitles, result.brokenLinksPageUrls, result.brokenLinksURLS)
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  chrome.storage.local.get(
+    [
+      "brokenLinksPageUrls",
+      "brokenLinksURLS",
+      "brokenLinksTitles",
+      "currentUrl",
+    ],
+    function (result) {
+      const array = result.brokenLinksTitles;
+      const length = array.length;
+      populateData(
+        result.brokenLinksTitles,
+        result.brokenLinksPageUrls,
+        result.brokenLinksURLS,
+        result.currentUrl
+      ),
+      populateReasons(result.brokenLinksURLS);
+      populateCourseNames(length);
+      populateLocations();
+    }
+  );
 });
 
-
-
-//takes all of the arrays as a parameter and cleans them up and stores each of them to 
-//a new array 
+//takes all of the arrays as a parameter and cleans them up and stores each of them to
+//a new array
 //also contains all of the button funcionality
-function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
- 
- /**************************************************************************/ 
-/***Cleans Array of Titles***/
-  let externalink ="Links to an external site."
-  let Titles = Titles1.map(title => {
-    if (title.includes(externalink)){
-      return title.replace(/\n\s*\n\nLinks to an external site\./g, '',"");
+function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
+  /**************************************************************************/
+  /***Cleans Array of Titles***/
+  let externalink = "Links to an external site.";
+  let Titles = Titles1.map((title) => {
+    if (title.includes(externalink)) {
+      return title.replace(/\n\s*\n\nLinks to an external site\./g, "", "");
     }
     return title;
-  })
-/**************************************************************************/
- 
+  });
+  /**************************************************************************/
 
-/***********************************************************/
-/***Cleans Array of Page Urls***/
+  /***********************************************************/
+  /***Cleans Array of Page Urls***/
   // prefix that is needed to be added to the page url
   let prefix = "https://byui.instructure.com";
-  
-  //adds the prefix to all of the page url
 
+  //adds the prefix to all of the page url
   let PageUrlArray = PageUrlArray1.map((url) => url);
   /***********************************************************/
 
+  /***********************************************************************************************************/
+  /***Cleans Array of Broken links***/
+  const getMainCourseIdForBrokenLinks = (url) => {
+    let parts = url.split("/");
+    return parts[4]; // Adjust index based on URL structure
+  };
 
-/***********************************************************************************************************/
-/***Cleans Array of Broken links***/
-  let prefix2 = "https://byui.instructure.com/" ;
+  let currentId = getMainCourseIdForBrokenLinks(CurrentUrl);
+  console.log(currentId);
+
+  let prefix2 = "https://byui.instructure.com/";
+  let prefix3 = `https://byui.instructure.com/courses/${currentId}/`;
 
   // urls with these prases require the prefix to be added maunualy
   let phrase1 = "$CANVAS_COURSE_REFERENCE$";
   let phrase2 = "/courses";
   let phrase3 = "$CANVAS_OBJECT_REFERENCE$";
   let phrase4 = "media_objects_iframe";
+  let phrase5 = "%24CANVAS_OBJECT_REFERENCE%24";
 
- 
   //maunual fix if the phrases are included in the link
-  let BrokenLinkArray = BrokenLinkArray1.map(url => {
-    if (url.includes(phrase1) || url.includes(phrase2) || url.includes(phrase3) || url.includes(phrase4) ){
+  let BrokenLinkArray = BrokenLinkArray1.map((url) => {
+    if (
+      url.includes(phrase1) ||
+      url.includes(phrase2) ||
+      url.includes(phrase3) ||
+      url.includes(phrase4)
+    ) {
       return prefix2 + url;
+    } else if (url.includes(phrase5)) {
+      return prefix3 + url;
     }
     return url;
   });
-/***********************************************************************************************************/
 
+  /***********************************************************************************************************/
 
-/****************************************************************/
-/***Text areas***/
+  /****************************************************************/
+  /***Text areas***/
   //elements of all of the text areas
+  let coursesTextArea = document.getElementById("course_name");
+  let reasonTextArea = document.getElementById("broken_reason");
+  let locationTextArea = document.getElementById("broken_locations");
   let titlesTextArea = document.getElementById("link_text");
   let linkTextTextarea = document.getElementById("page_urls");
-  let brokenLinkTextArea = document.getElementById("broken_links")
+  let brokenLinkTextArea = document.getElementById("broken_links");
+  
 
   //turns all the arrays to a string
-  titlesTextArea.value = Titles.join('\n');
-  linkTextTextarea.value = PageUrlArray.join('\n');
-  brokenLinkTextArea.value = BrokenLinkArray.join('\n');
-/****************************************************************/
+  titlesTextArea.value = Titles.join("\n");
+  linkTextTextarea.value = PageUrlArray.join("\n");
+  brokenLinkTextArea.value = BrokenLinkArray.join("\n");
 
+  /****************************************************************/
 
-/**************************************************************************/
-/*** Copy Titles Button ***/
+  /**************************************************************************/
+  /*** Copy Titles Button ***/
   let copyTitlesButton = document.getElementById("copyLinkTextButton");
 
-  function CopyTitles(){
+  function CopyTitles() {
     titlesTextArea.select();
     navigator.clipboard.writeText(titlesTextArea.value);
   }
 
-  copyTitlesButton.addEventListener('click', CopyTitles);
-/**************************************************************************/
+  copyTitlesButton.addEventListener("click", CopyTitles);
+  /**************************************************************************/
 
-
-/**************************************************************************/
-/*** Copy Page urls Button ***/
+  /**************************************************************************/
+  /*** Copy Page urls Button ***/
   let copyPageUrlsButton = document.getElementById("copyPageUrlsButton");
 
-  function copyPageUrls(){
+  function copyPageUrls() {
     linkTextTextarea.select();
     navigator.clipboard.writeText(linkTextTextarea.value);
   }
 
-  copyPageUrlsButton.addEventListener('click', copyPageUrls);
-/**************************************************************************/
+  copyPageUrlsButton.addEventListener("click", copyPageUrls);
+  /**************************************************************************/
 
-
-/**************************************************************************/
-/***Copy Links Button***/
+  /**************************************************************************/
+  /***Copy Links Button***/
   let copyBrokenLinksButton = document.getElementById("copyBrokenLinksButton");
 
-  function copyBrokenLinks(){
+  function copyBrokenLinks() {
     brokenLinkTextArea.select();
     navigator.clipboard.writeText(brokenLinkTextArea.value);
   }
 
-  copyBrokenLinksButton.addEventListener('click', copyBrokenLinks);
-/**************************************************************************/
+  copyBrokenLinksButton.addEventListener("click", copyBrokenLinks);
+  /**************************************************************************/
 
-
-/**************************************************************************/
-/***Copies all of the links at once Button ***/
+  /**************************************************************************/
+  /***Copies all of the links at once Button ***/
   let copyAllButton = document.getElementById("copyAllButton");
 
-  function CopyAll(){
-    let titleText = titlesTextArea.value;
-    let linkText = linkTextTextarea.value;
-    let brokenLinkText = brokenLinkTextArea.value;
+  function CopyAll() {
+    const coursesTextArea = document.getElementById("course_name");
+    const reasonTextArea = document.getElementById("broken_reason");
+    const locationTextArea = document.getElementById("broken_location");
+    const titlesTextArea = document.getElementById("link_text");
+    const linkTextTextarea = document.getElementById("page_urls");
+    const brokenLinkTextArea = document.getElementById("broken_links");
 
-    let titles = titleText.split('\n');
-    let links = linkText.split('\n');
-    let brokenLinks = brokenLinkText.split('\n');
-    let combinedText = '';
+    const courses = coursesTextArea.value.split('\n');
+    const reasons = reasonTextArea.value.split('\n');
+    const locations = locationTextArea.value.split('\n');
+    const titles = titlesTextArea.value.split('\n');
+    const pageUrls = linkTextTextarea.value.split('\n');
+    const brokenLinks = brokenLinkTextArea.value.split('\n');
 
-    let rows = titles.length;
-
-    for (let i = 0; i < rows; i++){
-      combinedText += `${(titles[i])}\t${(links[i])}\t${brokenLinks[i]}\n`;
-    }
-
-    navigator.clipboard.writeText(combinedText);
+    let combinedText = "";
+    for (let i = 0; i < courses.length; i++) {
+      combinedText += [
+        courses[i],
+        "", // Status is missing in the provided JavaScript code. Place an empty string here as a placeholder
+        reasons[i],
+        locations[i],
+        titles[i],
+        pageUrls[i],
+        brokenLinks[i],
+      ].join("\t") + "\n"; // Join with tabs and add a newline at the end
   }
 
+  navigator.clipboard.writeText(combinedText).then(function() {
+    console.log('Copying to clipboard was successful!');
+  }, function(err) {
+    console.error('Could not copy text: ', err);
+  });
+}
+
   copyAllButton.addEventListener("click", CopyAll);
-/**************************************************************************/
+  /**************************************************************************/
 
-
-// optional setting
+  // optional setting
   //clear all button
   // let clearAllButton = document.querySelector("#clearAllButton");
 
@@ -147,12 +190,10 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1) {
   //   linkTextTextarea.value = "";
   //   brokenLinkTextArea.value= "";
 
-    
   // }
 
   // clearAllButton.addEventListener("click", ClearAll);
 }
-
 
 //FUNCTION: takes all the urls, cleans them//
 //PARAMETERS: the Broken Link array
@@ -471,4 +512,9 @@ function populateLocations() {
         navigator.clipboard.writeText(locationsTextArea.value);
       }
 
-    }})}
+      locationsCopyButton.addEventListener("click", copyLocations);
+    } else {
+      console.log("Error");
+    }
+  });
+}
