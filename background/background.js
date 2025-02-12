@@ -123,6 +123,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       sendResponse({ displays: enabledDisplays });
     });
     return true;
+  } else if (msg.action === "getMasterLists") {
+    // New endpoint to provide the master lists for both clickable and display scripts.
+    sendResponse({ clickableScripts, displayScripts });
   }
 });
 

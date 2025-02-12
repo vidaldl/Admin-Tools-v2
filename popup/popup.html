@@ -3,18 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <title>Canvas LMS Admin Enhancer</title>
-    <!-- Locally imported Bootstrap CSS (place bootstrap.min.css in the popup folder or an accessible folder) -->
-    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css" />
+    <!-- Locally imported Bootstrap CSS -->
+    <link rel="stylesheet" href="bootstrap.min.css" />
     <!-- Custom styles for the popup -->
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <div class="container mt-3">
       <h3>Available Actions</h3>
-      <!-- This container will be populated with buttons for each clickable script -->
+      <!-- Container for dynamically generated clickable buttons -->
       <div id="clickable-buttons-container" class="btn-group-vertical"></div>
+      <!-- Button to open the Options page -->
+      <button id="open-options" class="btn btn-secondary mt-3">Options</button>
     </div>
-    <script src="../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="popup.js"></script>
   </body>
-</html>
+  </html>
