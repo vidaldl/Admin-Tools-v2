@@ -1,0 +1,41 @@
+/* popup.css */
+
+/* 
+  Control overall popup sizing to allow more space.
+  For instance, a 400px wide by up to 600px tall container.
+*/
+.popup-container {
+    width: 400px;        /* Force a wider popup */
+    max-height: 600px;   /* You can adjust this limit */
+    overflow-y: auto;    /* Scroll if content overflows */
+    background-color: #fff;
+    color: #212529;
+    font-family: "Open Sans", Arial, sans-serif;
+  }
+  
+  /* Navbar branding color (already done via "bg-primary" in HTML).
+     If you want a custom color, override .bg-primary here:
+     
+  .navbar.bg-primary {
+    background-color: #005ca9 !important;
+  }
+  */
+  
+  /* Hover spin effect for the cog icon */
+  #settings-cog {
+    transition: transform 0.3s ease;
+  }
+  #settings-cog:hover {
+    transform: rotate(90deg); /* 1/4 turn */
+  }
+  
+  /* Optional: Style for each button to have consistent look (beyond .btn-outline-primary):
+  .btn {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+  */
+  
+  /* If you want the Settings text hidden on small popups, you can keep .d-none .d-md-inline usage 
+     or change it to always visible. Adjust as you prefer. */
+  
