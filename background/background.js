@@ -16,13 +16,13 @@ const displayScripts = [
   {
     id: "displayScript1",
     file: "content/displays/displayScript1.js",
-    matches: ["https://canvas.instructure.com/*"],
+    matches: ["https://byui.instructure.com/*"],
     runAt: "document_idle"
   },
   {
     id: "displayScript2",
     file: "content/displays/displayScript2.js",
-    matches: ["https://canvas.instructure.com/*"],
+    matches: ["https://byui.instructure.com/*"],
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
