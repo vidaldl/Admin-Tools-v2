@@ -6,8 +6,18 @@
 --------------------------- */
 // Master list for clickable scripts (triggered from the popup)
 const clickableScripts = [
-  { id: "clickableScript1", name: "Action One", file: "content/clickables/clickableScript1.js" },
-  { id: "clickableScript2", name: "Action Two", file: "content/clickables/clickableScript2.js" }
+  { 
+    id: "clickableScript1", 
+    name: "Action One", 
+    description:"Description of Action 1", 
+    file: "content/clickables/clickableScript1.js" 
+  },
+  { 
+    id: "clickableScript2", 
+    name: "Action Two", 
+    description:"Description of Action 2", 
+    file: "content/clickables/clickableScript2.js" 
+  }
   // Add more clickable scripts as needed
 ];
 
@@ -17,12 +27,16 @@ const displayScripts = [
     id: "displayScript1",
     file: "content/displays/displayScript1.js",
     matches: ["https://byui.instructure.com/*"],
+    name: "Display One",
+    description: "This script will display a message on the Canvas LMS console.",
     runAt: "document_idle"
   },
   {
     id: "displayScript2",
     file: "content/displays/displayScript2.js",
     matches: ["https://byui.instructure.com/*"],
+    name: "Display Two",
+    description: "This script will display a message on the Canvas LMS console.",
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
@@ -71,25 +85,28 @@ function registerDisplayScripts() {
   chrome.storage.sync.get("enabledDisplays", (data) => {
     const enabledConfig = data.enabledDisplays || {};
     displayScripts.forEach(scriptDef => {
-      if (enabledConfig[scriptDef.id]) {
-        // Register the display script dynamically
-        chrome.scripting.registerContentScripts([{
-          id: scriptDef.id,
-          js: [scriptDef.file],
-          matches: scriptDef.matches,
-          runAt: scriptDef.runAt,
-          persistAcrossSessions: true // Optional: ensures registration persists
-        }]).then(() => {
-          console.log(`[background] Registered display script: ${scriptDef.id}`);
-        }).catch(err => {
-          console.error(`[background] Failed to register ${scriptDef.id}:`, err);
+      // Unregister any previously registered script with this ID to prevent duplicates.
+      chrome.scripting.unregisterContentScripts({ ids: [scriptDef.id] })
+        .catch(err => {
+          // It's safe to ignore errors if the script wasn't registered.
+          console.warn(`[background] Unregister warning for ${scriptDef.id}:`, err);
+        })
+        .finally(() => {
+          // If the script is enabled, register it.
+          if (enabledConfig[scriptDef.id]) {
+            chrome.scripting.registerContentScripts([{
+              id: scriptDef.id,
+              js: [scriptDef.file],
+              matches: scriptDef.matches,
+              runAt: scriptDef.runAt,
+              persistAcrossSessions: true
+            }]).then(() => {
+              console.log(`[background] Registered display script: ${scriptDef.id}`);
+            }).catch(err => {
+              console.error(`[background] Failed to register ${scriptDef.id}:`, err);
+            });
+          }
         });
-      } else {
-        // Unregister the script if it's disabled
-        chrome.scripting.unregisterContentScripts({ ids: [scriptDef.id] })
-          .then(() => console.log(`[background] Unregistered display script: ${scriptDef.id}`))
-          .catch(err => console.error(`[background] Failed to unregister ${scriptDef.id}:`, err));
-      }
     });
   });
 }

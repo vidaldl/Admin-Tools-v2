@@ -1,6 +1,53 @@
-/* options/options.css */
-body {
-    padding: 15px;
-    min-width: 300px;
+/* options.css */
+
+/* 
+  Basic Canvas-like font plus a bright BYUI-like brand color scheme.
+  Tweak these variables to match your brand preference.
+*/
+:root {
+    --primary-color: #005ca9;       /* Blue brand color */
+    --text-color: #212529;          /* Dark text */
+    --muted-text-color: #6c757d;    /* Bootstrap’s default muted text */
+    --body-bg: #fff;
+    --font-family-base: "Open Sans", Arial, sans-serif;
   }
+  
+  /* Body reset and default styling */
+  body {
+    margin: 0;
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    font-family: var(--font-family-base);
+  }
+  
+  /* Header (banner) styling */
+  header.bg-primary {
+    background-color: var(--primary-color) !important;
+  }
+  
+  /* Optional: fine-tune heading styles */
+  h1, h2 {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Toggle Description Text */
+  .toggle-description {
+    margin: 0.25rem 0 1rem 2rem; /* Indent text under the toggle label */
+    font-size: 0.9rem;
+    color: var(--muted-text-color);
+  }
+  
+  /* Switch sizing & spacing */
+  .form-check-input {
+    width: 2.25em;
+    height: 1.25em;
+    cursor: pointer;
+  }
+  
+  /* 
+    Additional custom styling (if needed):
+    e.g., .form-check-label { margin-left: 0.5rem; } 
+    But typically the default spacing is sufficient.
+  */
   

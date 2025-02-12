@@ -1,27 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Options - Canvas LMS Admin Enhancer</title>
-    <!-- Locally imported Bootstrap CSS (ensure bootstrap.min.css is placed appropriately) -->
-    <link rel="stylesheet" href="bootstrap.min.css" />
-    <!-- Custom options page styles -->
+    <title>BYUI Canvas Admin Tools - Options</title>
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
-    <div class="container mt-3">
-      <h2>Extension Options</h2>
-      <hr />
-      <h4>Display Scripts</h4>
-      <!-- This div will be populated dynamically with checkboxes for each display script -->
-      <div id="display-scripts-options" class="mb-3"></div>
-      
-      <h4>Clickable Scripts</h4>
-      <!-- This div will be populated dynamically with checkboxes for each clickable script -->
-      <div id="clickable-scripts-options" class="mb-3"></div>
-      
-      <button id="save-button" class="btn btn-success">Save Options</button>
-    </div>
+    <header class="bg-primary text-white py-4 mb-4">
+      <div class="container">
+        <h1 class="mb-0 fw-bold">BYUI Canvas Admin Tools</h1>
+      </div>
+    </header>
+    <main class="container">
+      <div class="row">
+        <!-- Left Column: Clickables -->
+        <div class="col-md-6 mb-4">
+          <h2 class="text-dark mb-3">Clickables</h2>
+          <p class="text-muted">
+            The tools under this label will only run when you click the button in the popup.
+            They primarily automate tasks and turn several button clicks into just a few.
+            These options appear in the extension popup if enabled.
+          </p>
+          <!-- Container for dynamically injected clickable toggles -->
+          <div id="clickable-scripts-options"></div>
+        </div>
+        <!-- Right Column: Displays -->
+        <div class="col-md-6 mb-4">
+          <h2 class="text-dark mb-3">Displays</h2>
+          <p class="text-muted">
+            The tools under the Displays label run automatically on the correct pages.
+            Their purpose is to make navigation easier or provide quick information.
+          </p>
+          <!-- Container for dynamically injected display toggles -->
+          <div id="display-scripts-options"></div>
+        </div>
+      </div>
+    </main>
     <script src="options.js"></script>
   </body>
 </html>

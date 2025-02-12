@@ -1,21 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Canvas LMS Admin Enhancer</title>
-    <!-- Locally imported Bootstrap CSS -->
-    <link rel="stylesheet" href="bootstrap.min.css" />
+    <title>Canvas Admin</title>
+    <!-- Bootstrap from your specified path -->
+    <link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css" />
     <!-- Custom styles for the popup -->
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <div class="container mt-3">
-      <h3>Available Actions</h3>
-      <!-- Container for dynamically generated clickable buttons -->
-      <div id="clickable-buttons-container" class="btn-group-vertical"></div>
-      <!-- Button to open the Options page -->
-      <button id="open-options" class="btn btn-secondary mt-3">Options</button>
+    <!-- Header Bar -->
+    <nav class="navbar navbar-dark bg-primary d-flex justify-content-between align-items-center px-3">
+      <span class="navbar-brand mb-0 fs-5">Canvas Admin</span>
+      <!-- Cog Icon (clickable or hover-only) -->
+      <a href="#" id="open-options" class="text-white text-decoration-none d-flex align-items-center">
+        <img
+          src="../assets/Cog.svg"
+          alt="Settings"
+          id="settings-cog"
+          class="me-1"
+          width="24"
+          height="24"
+        />
+        <span class="d-none d-md-inline ms-1">Settings</span>
+      </a>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="popup-container p-3">
+      <!-- Buttons Section -->
+      <div class="mb-3">
+        <h5>Available Actions</h5>
+        <div
+          id="clickable-buttons-container"
+          class="d-grid gap-2"
+          role="group"
+          aria-label="Available Actions"
+        >
+          <!-- Dynamically inserted buttons go here, for example:
+            <button class="btn btn-outline-primary">Action 1</button>
+            <button class="btn btn-outline-primary">Action 2</button>
+            ...
+          -->
+        </div>
+      </div>
+
+      <!-- Another Section or Additional Content, if desired
+      <div class="mb-3">
+        <h5>Another Section</h5>
+        ...
+      </div>
+      -->
     </div>
+    
     <script src="popup.js"></script>
   </body>
-  </html>
+</html>

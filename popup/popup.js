@@ -28,7 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Open the options page when the corresponding button is clicked.
     document.getElementById("open-options").addEventListener("click", () => {
-        chrome.runtime.openOptionsPage();
+        chrome.tabs.create({
+            url: chrome.runtime.getURL("options/options.html")
+          });
       });
   });
   
