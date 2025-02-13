@@ -35,8 +35,8 @@ const displayScripts = [
     id: "displaySectionsBreadcrumb",
     file: "content/displays/SectionsBreadcrumb/displaySectionsBreadcrumb.js",
     matches: ["https://*.instructure.com/courses/*"],
-    name: "Display Sections Column",
-    description: "Adds a dedicated 'Sections' column to the course listings on Canvas. Get a quick, at-a-glance summary of each course's section details.",
+    name: "Display Sections in Breadcrumbs",
+    description: "Enhances the breadcrumb trail by appending formatted section numbers for the current course.",
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
