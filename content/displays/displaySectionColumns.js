@@ -92,34 +92,39 @@ async function main() {
 }
 
 /**
- * Waits for a condition to be met on a parent element and then calls a callback.
+ * Observes changes on the parent element and calls the callback when the condition is met,
+ * debouncing the calls to avoid repeated execution.
  * @param {HTMLElement} parent - The element to observe.
  * @param {Function} conditionFn - A function returning a boolean.
  * @param {Function} callback - Function to execute once the condition is met.
+ * @param {number} debounceTime - Delay in ms for debouncing (default 250ms).
  */
-function waitFor(parent, conditionFn, callback) {
+function observeTableChanges(parent, conditionFn, callback, debounceTime = 250) {
+  let timeoutId;
   const observer = new MutationObserver(() => {
     if (conditionFn()) {
-      observer.disconnect();
-      callback();
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        callback();
+      }, debounceTime);
     }
   });
   observer.observe(parent, { childList: true, subtree: true });
+  return observer;
 }
 
-// If the option to show the sections column is enabled, monitor changes and update the column.
-
+// Monitor changes in the table continuously.
 let lastHTML = '';
 const contentContainer = document.querySelector('#content');
-waitFor(contentContainer, () => {
-    const tbody = document.querySelector('tbody[data-automation="courses list"]');
-    if (!tbody) return false;
-    const currentHTML = tbody.innerHTML;
-    return currentHTML && currentHTML !== lastHTML;
+observeTableChanges(contentContainer, () => {
+  const tbody = document.querySelector('tbody[data-automation="courses list"]');
+  if (!tbody) return false;
+  const currentHTML = tbody.innerHTML;
+  return currentHTML && currentHTML !== lastHTML;
 }, async () => {
-    await main();
-    const tbody = document.querySelector('tbody[data-automation="courses list"]');
-    if (tbody) lastHTML = tbody.innerHTML;
+  await main();
+  const tbody = document.querySelector('tbody[data-automation="courses list"]');
+  if (tbody) {
+    lastHTML = tbody.innerHTML;
+  }
 });
-
-
