@@ -24,19 +24,11 @@ const clickableScripts = [
 // Master list for display scripts (auto-registered on target pages)
 const displayScripts = [
   {
-    id: "displayScript1",
-    file: "content/displays/displayScript1.js",
-    matches: ["https://byui.instructure.com/*"],
-    name: "Display One",
-    description: "This script will display a message on the Canvas LMS console.",
-    runAt: "document_idle"
-  },
-  {
-    id: "displayScript2",
-    file: "content/displays/displayScript2.js",
-    matches: ["https://byui.instructure.com/*"],
-    name: "Display Two",
-    description: "This script will display a message on the Canvas LMS console.",
+    id: "displaySectionColumns",
+    file: "content/displays/displaySectionColumns.js",
+    matches: ["https://*.instructure.com/accounts/*"],
+    name: "Display Sections Column",
+    description: "Adds a dedicated 'Sections' column to the course listings on Canvas. Get a quick, at-a-glance summary of each course's section details.",
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
@@ -54,14 +46,14 @@ function initializeConfiguration() {
     if (!data.enabledClickables) {
       configToSet.enabledClickables = {};
       clickableScripts.forEach(script => {
-        configToSet.enabledClickables[script.id] = true;
+        configToSet.enabledClickables[script.id] = false;
       });
     }
     // Similarly for display scripts
     if (!data.enabledDisplays) {
       configToSet.enabledDisplays = {};
       displayScripts.forEach(script => {
-        configToSet.enabledDisplays[script.id] = true;
+        configToSet.enabledDisplays[script.id] = false;
       });
     }
 

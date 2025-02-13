@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
             checkbox.type = "checkbox";
             checkbox.className = "form-check-input";
             checkbox.id = script.id;
-            // Default to true if not explicitly set.
-            checkbox.checked = (enabledDisplays[script.id] === undefined) ? true : enabledDisplays[script.id];
+            // Default to false if not explicitly set.
+            checkbox.checked = (enabledDisplays[script.id] === undefined) ? false : enabledDisplays[script.id];
   
             // Create the label with the script name.
             const label = document.createElement("label");
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
             checkbox.type = "checkbox";
             checkbox.className = "form-check-input";
             checkbox.id = script.id;
-            checkbox.checked = (enabledClickables[script.id] === undefined) ? true : enabledClickables[script.id];
+            checkbox.checked = (enabledClickables[script.id] === undefined) ? false : enabledClickables[script.id];
   
             const label = document.createElement("label");
             label.className = "form-check-label fw-semibold";
