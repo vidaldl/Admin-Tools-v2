@@ -25,7 +25,7 @@ const clickableScripts = [
 const displayScripts = [
   {
     id: "displaySectionColumns",
-    file: "content/displays/displaySectionColumns.js",
+    file: "content/displays/SectionColumn/displaySectionColumns.js",
     matches: ["https://*.instructure.com/accounts/*"],
     name: "Display Sections Column",
     description: "Adds a dedicated 'Sections' column to the course listings on Canvas. Get a quick, at-a-glance summary of each course's section details.",

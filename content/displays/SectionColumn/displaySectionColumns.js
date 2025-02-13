@@ -15,7 +15,8 @@ async function buildDetails(row) {
   const courseID = href.split('/courses/')[1];
   const info = { row, courseLink, courseID, sections: [] };
 
-  const response = await fetch(`https://byui.instructure.com/api/v1/courses/${courseID}/sections`);
+  const host = window.location.origin;
+  const response = await fetch(`${host}/api/v1/courses/${courseID}/sections`);
   const text = await response.text();
   info.sections = JSON.parse(text.replace('while(1);', ''));
   return info;
