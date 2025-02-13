@@ -17,8 +17,8 @@ async function buildDetails(row) {
 
   const host = window.location.origin;
   const response = await fetch(`${host}/api/v1/courses/${courseID}/sections`);
-  const text = await response.text();
-  info.sections = JSON.parse(text.replace('while(1);', ''));
+  const jsonReponse = await response.json();
+  info.sections = jsonReponse;
   return info;
 }
 
