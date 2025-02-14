@@ -46,6 +46,14 @@ const displayScripts = [
     name: "Module Navbar",
     description: "Displays a navbar on the modules page of a course.",
     runAt: "document_idle"
+  },
+  {
+    id: "displayParentLink",
+    file: "content/displays/ParentLink/displayParentLink.js",
+    matches: ["https://*.instructure.com/courses/*"],
+    name: "Module Navbar",
+    description: "Displays a navbar on the modules page of a course.",
+    runAt: "document_idle"
   }
   // Add additional display scripts as needed
 ];
