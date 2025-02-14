@@ -51,8 +51,8 @@ const displayScripts = [
     id: "displayParentLink",
     file: "content/displays/ParentLink/displayParentLink.js",
     matches: ["https://*.instructure.com/courses/*"],
-    name: "Module Navbar",
-    description: "Displays a navbar on the modules page of a course.",
+    name: "Blueprint Parent Link",
+    description: "Adds link in the bottom of the page to a course to its blueprint if it is a blueprint child.",
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
