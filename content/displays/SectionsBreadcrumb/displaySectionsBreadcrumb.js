@@ -11,8 +11,6 @@ async function getData(courseID) {
     const host = window.location.origin;
     const response = await fetch(`${host}/api/v1/courses/${courseID}/sections`);
     const jsonReponse = await response.json();
-    console.log("BREADCRUMBS")
-    console.log(jsonReponse)
 
     return jsonReponse;
 }
