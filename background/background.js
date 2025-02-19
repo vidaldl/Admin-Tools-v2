@@ -54,6 +54,14 @@ const displayScripts = [
     name: "Blueprint Parent Link",
     description: "Adds link in the bottom of the page to a course to its blueprint if it is a blueprint child.",
     runAt: "document_idle"
+  },
+  {
+    id: "displayBlueprintSections",
+    file: "content/displays/BlueprintSections/displayBlueprintSections.js",
+    matches: ["https://*.instructure.com/courses/*"],
+    name: "Blueprint Associated Sections",
+    description: `Adds a link to the sections associated with a blueprint course when in "Associated Courses".`,
+    runAt: "document_idle"
   }
   // Add additional display scripts as needed
 ];
