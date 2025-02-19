@@ -1,42 +1,82 @@
 "use strict";
 
 /**
- * Waits for a condition to be true on a given parent element before calling a callback function.
- * @param {HTMLElement} parent - The element to observe for changes.
- * @param {Function} conditionFn - A function returning a boolean indicating whether the condition is met.
- * @param {Function} callback - The function to call once the condition is met.
+ * Ensures that the "Select All" checkbox and its label remain visible.
+ * This function forces their display style and removes any classes that might hide them.
  */
-const waitFor = (parent, conditionFn, callback) => {
-  const observer = new MutationObserver(() => {
-    if (conditionFn()) {
-      observer.disconnect();
-      callback();
-    }
-  });
-  observer.observe(parent, {
-    attributes: true,
-    childList: true,
-    subtree: true,
-  });
+const ensureSelectAllVisible = () => {
+  const selectAllCheckbox = document.querySelector('#selectAllCheckbox');
+  const selectAllLabel = document.querySelector('#selectAllCheckbox + [for="selectAllCheckbox"]');
+  if (selectAllCheckbox && selectAllLabel) {
+    // Force the elements to be visible regardless of page changes.
+    selectAllCheckbox.style.display = 'inline-block';
+    selectAllLabel.style.display = 'inline-block';
+    selectAllCheckbox.classList.remove("screenreader-only");
+    selectAllLabel.classList.remove("screenreader-only");
+  }
 };
 
 /**
- * Waits for the "select all" button elements to appear in the DOM,
- * then removes the "screenreader-only" class from both the checkbox and its label.
+ * Initializes the "Select All" functionality by adding event listeners
+ * to the "Select All" checkbox and all individual file checkboxes.
+ * This function marks the elements as initialized so that event listeners
+ * are not attached multiple times.
  */
-const displaySelectAllButton = () => {
-  let checkbox, label;
-  waitFor(document, () => {
-    checkbox = document.querySelector('#selectAllCheckbox');
-    label = document.querySelector('#selectAllCheckbox + [for="selectAllCheckbox"]');
-    return checkbox && label;
-  }, () => {
-    checkbox.classList.remove("screenreader-only");
-    label.classList.remove("screenreader-only");
-    console.log("Select All button is now visible.");
+const initializeSelectAll = () => {
+  const selectAllCheckbox = document.querySelector('#selectAllCheckbox');
+  const selectAllLabel = document.querySelector('#selectAllCheckbox + [for="selectAllCheckbox"]');
+  if (!selectAllCheckbox || !selectAllLabel) return;
+
+  // Prevent multiple initializations.
+  if (selectAllCheckbox.dataset.initialized === "true") return;
+  selectAllCheckbox.dataset.initialized = "true";
+  selectAllLabel.dataset.initialized = "true";
+
+  // Reveal the elements.
+  selectAllCheckbox.classList.remove("screenreader-only");
+  selectAllLabel.classList.remove("screenreader-only");
+
+  // Function to update "Select All" state based on individual file checkboxes.
+  const updateSelectAllCheckbox = () => {
+    const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+    selectAllCheckbox.checked = Array.from(fileCheckboxes).every(cb => cb.checked);
+  };
+
+  // When "Select All" is toggled, update all file checkboxes.
+  selectAllCheckbox.addEventListener("change", () => {
+    const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+    fileCheckboxes.forEach(cb => {
+      cb.checked = selectAllCheckbox.checked;
+    });
   });
+
+  // When any file checkbox is changed, update the "Select All" state.
+  const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+  fileCheckboxes.forEach(cb => {
+    cb.addEventListener("change", updateSelectAllCheckbox);
+  });
+
+  console.log("Select All functionality initialized.");
 };
 
-// Run displaySelectAllButton.
+/**
+ * Runs the initialization and ensures visibility.
+ */
+const runSelectAll = () => {
+  initializeSelectAll();
+  ensureSelectAllVisible();
+};
 
-displaySelectAllButton();
+// Persistent observer: monitors the document body for changes and re-applies our modifications.
+const persistentObserver = new MutationObserver(() => {
+  runSelectAll();
+});
+persistentObserver.observe(document.body, { childList: true, subtree: true });
+
+// Initial run in case elements are already present.
+runSelectAll();
+
+// Optionally, check storage to ensure the functionality should run.
+
+runSelectAll();
+
