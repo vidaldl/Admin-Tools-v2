@@ -62,6 +62,14 @@ const displayScripts = [
     name: "Blueprint Associated Sections",
     description: `Adds a link to the sections associated with a blueprint course when in "Associated Courses".`,
     runAt: "document_idle"
+  },
+  {
+    id: "displaySelectAllFiles",
+    file: "content/displays/SelectAllFiles/displaySelectAllFiles.js",
+    matches: ["https://*.instructure.com/courses/*/files*"],
+    name: "Select All Files Button",
+    description: `Adds a "Select All" button to the Files page in Canvas.`,
+    runAt: "document_idle"
   }
   // Add additional display scripts as needed
 ];
