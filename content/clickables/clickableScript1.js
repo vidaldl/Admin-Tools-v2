@@ -1,1 +1,0 @@
-console.log("Clickable Script 1 Loaded");

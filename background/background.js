@@ -7,10 +7,10 @@
 // Master list for clickable scripts (triggered from the popup)
 const clickableScripts = [
   { 
-    id: "clickableScript1", 
-    name: "Action One", 
-    description:"Description of Action 1", 
-    file: "content/clickables/clickableScript1.js" 
+    id: "deleteAllQuestions", 
+    name: "Delete All Quiz Questions", 
+    description:"Deletes all questions in a given quiz.", 
+    file: "content/clickables/DeleteAllQuestions/deleteAllQuestions.js" 
   },
   { 
     id: "clickableScript2", 
