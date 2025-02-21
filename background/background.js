@@ -7,10 +7,10 @@
 // Master list for clickable scripts (triggered from the popup)
 const clickableScripts = [
   { 
-    id: "clickableScript1", 
-    name: "Action One", 
-    description:"Description of Action 1", 
-    file: "content/clickables/clickableScript1.js" 
+    id: "deleteAllQuestions", 
+    name: "Delete All Quiz Questions", 
+    description:"Deletes all questions in a given quiz.", 
+    file: "content/clickables/DeleteAllQuestions/deleteAllQuestions.js" 
   },
   { 
     id: "clickableScript2", 
@@ -23,6 +23,7 @@ const clickableScripts = [
 
 // Master list for display scripts (auto-registered on target pages)
 const displayScripts = [
+
   {
     id: "displaySectionColumns",
     file: "content/displays/SectionColumn/displaySectionColumns.js",
@@ -73,6 +74,48 @@ const displayScripts = [
   }
   // Add additional display scripts as needed
 ];
+
+const utilScripts = [
+  {
+    id: "overrideConfirm",
+    matches: ["https://*.instructure.com/courses/*/quizzes/*/edit"],
+    file: "content/utils/overrideConfirm.js",
+    "run_at": "document_start"
+  }
+]
+
+
+/*---------------------------
+  Register Utility Functions
+ ---------------------------*/
+//  function registerUtilScripts() {
+//   utilScripts.forEach(scriptDef => {
+//     // Unregister any previously registered script with this ID to prevent duplicates.
+//     chrome.scripting.unregisterContentScripts({ ids: [scriptDef.id] })
+//       .catch(err => {
+//         // It's safe to ignore errors if the script wasn't registered.
+//         console.warn(`[background] Unregister warning for ${scriptDef.id}:`, err);
+//       })
+//       .finally(() => {
+//         // If the script is enabled, register it.
+        
+//         chrome.scripting.registerContentScripts([{
+//           id: scriptDef.id,
+//           js: [scriptDef.file],
+//           matches: scriptDef.matches,
+//           runAt: scriptDef.runAt,
+//           persistAcrossSessions: true
+//         }]).then(() => {
+//           console.log(`[background] Registered util script: ${scriptDef.id}`);
+//         }).catch(err => {
+//           console.error(`[background] Failed to register ${scriptDef.id}:`, err);
+//         });
+        
+//       });
+//   });
+//  }
+ 
+
 
 /* --------------------------
    Initialization Function
@@ -184,11 +227,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 // When the extension is installed:
 chrome.runtime.onInstalled.addListener(() => {
   console.log("[background] Extension installed.");
+
   initializeConfiguration();
 });
 
 // When the extension starts up:
 chrome.runtime.onStartup.addListener(() => {
   console.log("[background] Extension started.");
+
   initializeConfiguration();
 });
