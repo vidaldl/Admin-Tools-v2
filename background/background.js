@@ -17,6 +17,12 @@ const clickableScripts = [
     name: "Lock Blueprint Items", 
     description:"Locks every blueprint item present in the page. Only works in a list of items where the lock button is present (modules, assignments, quizzes, etc).", 
     file: "content/clickables/BlueprintLock/blueprintLock.js" 
+  },
+  { 
+    id: "blueprintUnlock", 
+    name: "Unlock Blueprint Items", 
+    description:"Unlocks every blueprint item present in the page. Only works in a list of items where the lock button is present (modules, assignments, quizzes, etc).", 
+    file: "content/clickables/BlueprintUnlock/blueprintUnlock.js" 
   }
   // Add more clickable scripts as needed
 ];
