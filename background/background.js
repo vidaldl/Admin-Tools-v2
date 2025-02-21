@@ -13,10 +13,10 @@ const clickableScripts = [
     file: "content/clickables/DeleteAllQuestions/deleteAllQuestions.js" 
   },
   { 
-    id: "clickableScript2", 
-    name: "Action Two", 
-    description:"Description of Action 2", 
-    file: "content/clickables/clickableScript2.js" 
+    id: "blueprintLock", 
+    name: "Lock Blueprint Items", 
+    description:"Locks every blueprint item present in the page. Only works in a list of items where the lock button is present (modules, assignments, quizzes, etc).", 
+    file: "content/clickables/BlueprintLock/blueprintLock.js" 
   }
   // Add more clickable scripts as needed
 ];
