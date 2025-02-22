@@ -4,6 +4,7 @@
  * Creates a navigation bar at the bottom of the page if it doesn't already exist.
  * The navbar is positioned based on the computed width of the sidebar (#header).
  */
+// TODO: Make this function run in any page of the course
 function createParentNavbar() {
   const sidebar = document.querySelector('#header');
   if (!sidebar) return;
