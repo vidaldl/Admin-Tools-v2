@@ -13,13 +13,14 @@
     font-family: "Open Sans", Arial, sans-serif;
   }
   
-  /* Navbar branding color (already done via "bg-primary" in HTML).
-     If you want a custom color, override .bg-primary here:
      
   .navbar.bg-primary {
-    background-color: #005ca9 !important;
+    background-color: #000000 !important;
   }
-  */
+  
+  #clickable-buttons-container .btn-primary {
+    background-color: #006EB6 !important;
+  }
   
   /* Hover spin effect for the cog icon */
   #settings-cog {
@@ -28,6 +29,7 @@
   #settings-cog:hover {
     transform: rotate(90deg); /* 1/4 turn */
   }
+  
   
   /* Optional: Style for each button to have consistent look (beyond .btn-outline-primary):
   .btn {
