@@ -5,8 +5,8 @@
   Tweak these variables to match your brand preference.
 */
 :root {
-    --primary-color: #005ca9;       /* Blue brand color */
-    --text-color: #212529;          /* Dark text */
+    --primary-color: #006EB6;       /* Blue brand color */
+    --text-color: #000000;          /* Dark text */
     --muted-text-color: #6c757d;    /* Bootstrap’s default muted text */
     --body-bg: #fff;
     --font-family-base: "Open Sans", Arial, sans-serif;
