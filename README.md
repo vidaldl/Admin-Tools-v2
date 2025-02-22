@@ -114,6 +114,7 @@ Adds a link at the bottom of the page to a course's blueprint if it is a bluepri
 
 
 #### Blueprint Associated Sections
+<img alt="Blueprint Associated Sections" src="content/displays/BlueprintSections/BlueprintSections.png" width="600">
 
 Adds a link to the sections associated with a blueprint course when in "Associated Courses".
 
@@ -121,9 +122,9 @@ Adds a link to the sections associated with a blueprint course when in "Associat
 1. Navigate to the blueprint associations page.
 2. Links to the associated sections will be automatically added.
 
-![Blueprint Associated Sections](path/to/image.png)
 
 #### Select All Files Button
+<img alt="Select All Files Button" src="content/displays/SelectAllFiles/SelectAllFiles.png" width="600">
 
 Adds a "Select All" button to the Files page in Canvas.
 
@@ -131,17 +132,19 @@ Adds a "Select All" button to the Files page in Canvas.
 1. Navigate to the Files page of a course.
 2. The "Select All" button will be automatically added.
 
-![Select All Files Button](path/to/image.png)
 
 ## Options
 
 The extension provides an options page to enable or disable specific clickables and displays.
 
 **Usage:**
-1. Open the extension options page.
+1. Open the extension options page. By clicking on the cog in the Popup
+
+    <img alt="Popup Options Link" src="popup/Popup.png" width="300">
+
 2. Toggle the desired clickables and displays.
 
-![Options Page](path/to/image.png)
+    <img alt="Options Page" src="options/Options.png" width="500">
 
 ## Contributing
 
