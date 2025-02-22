@@ -36,6 +36,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
 Clickables are scripts that are triggered manually from the extension's popup. They automate tasks and reduce multiple button clicks to just a few.
 
 #### Delete All Quiz Questions
+<img alt="Delete All Quiz Questions" src="content/clickables/DeleteAllQuestions/DeleteAllQuestions.png" width="300">
 
 Deletes all questions in a given quiz.
 
@@ -45,9 +46,10 @@ Deletes all questions in a given quiz.
 3. Click the "Delete All Quiz Questions" button.
 4. Confirm the deletion in the prompt.
 
-![Delete All Quiz Questions](path/to/image.png)
+
 
 #### Lock Blueprint Items
+<img alt="Lock Blueprint Items" src="content/clickables/BlueprintLock/BlueprintLock.png" width="300">
 
 Locks every blueprint item present on the page.
 
@@ -56,9 +58,9 @@ Locks every blueprint item present on the page.
 2. Open the extension popup.
 3. Click the "Lock Blueprint Items" button.
 
-![Lock Blueprint Items](path/to/image.png)
 
 #### Unlock Blueprint Items
+<img alt="Unlock Blueprint Items" src="content/clickables/BlueprintUnlock/BlueprintUnlock.png" width="300">
 
 Unlocks every blueprint item present on the page.
 
@@ -67,33 +69,33 @@ Unlocks every blueprint item present on the page.
 2. Open the extension popup.
 3. Click the "Unlock Blueprint Items" button.
 
-![Unlock Blueprint Items](path/to/image.png)
 
 ### Displays
 
 Displays are scripts that run automatically on specific pages to enhance navigation and provide quick information.
 
 #### Sections Column
+<img alt="Sections Column" src="content/displays/SectionColumn/SectionColumn.png" width="400">
 
-Adds a dedicated "Sections" column to the course listings on Canvas.
+Adds a dedicated "Sections" column to the course listings on Canvas. Any cross-listed sections are highlighted in blue.
 
 **Usage:**
 1. Navigate to the course listings page.
 2. The "Sections" column will be automatically added.
 
-![Sections Column](path/to/image.png)
 
 #### Sections in Breadcrumbs
+<img alt="Sections in Breadcrumbs" src="content/displays/SectionsBreadcrumb/SectionsBreadcrumb.png" width="400">
 
-Enhances the breadcrumb trail by appending formatted section numbers for the current course.
+Enhances the breadcrumb trail by appending formatted section numbers for the current course. Cross-listed sections are highlighted light blue.
 
 **Usage:**
 1. Navigate to a course page.
 2. The breadcrumb trail will be automatically enhanced with section numbers.
 
-![Sections in Breadcrumbs](path/to/image.png)
 
 #### Module Navbar
+<img alt="Module Navbar" src="content/displays/ModuleNavbar/ModuleNavbar.png" width="600">
 
 Displays a navbar on the modules page of a course.
 
@@ -101,9 +103,8 @@ Displays a navbar on the modules page of a course.
 1. Navigate to the modules page of a course.
 2. The navbar will be automatically added at the bottom of the page.
 
-![Module Navbar](path/to/image.png)
-
 #### Blueprint Parent Link
+<img alt="Blueprint Parent Link" src="content/displays/ParentLink/ParentLink.png" width="200">
 
 Adds a link at the bottom of the page to a course's blueprint if it is a blueprint child.
 
@@ -111,7 +112,6 @@ Adds a link at the bottom of the page to a course's blueprint if it is a bluepri
 1. Navigate to a course page.
 2. The link to the parent blueprint will be automatically added at the bottom of the page.
 
-![Blueprint Parent Link](path/to/image.png)
 
 #### Blueprint Associated Sections
 
