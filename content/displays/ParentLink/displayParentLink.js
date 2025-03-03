@@ -58,7 +58,7 @@ async function addBlueprintParent() {
     const host = window.location.origin;
     if (Object.keys(blueprintData).length > 0) {
       if (!document.getElementById('navToModule_ext')) {
-        createNavbar();
+        createParentNavbar();
       }
       const blueprintID = blueprintData[0].blueprint_course.id;
       const navbar = document.getElementById('navToModule_ext');
