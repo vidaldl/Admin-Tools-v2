@@ -24,10 +24,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
 
 ## Installation
 
-1. Clone the repository or download the ZIP file.  
-2. Open Chrome and navigate to `chrome://extensions/`.  
-3. Enable **Developer mode** using the toggle in the top right corner.  
-4. Click **Load unpacked** and select the directory containing the extension files.
+Follow the instructions in the **[Installation Guide](./INSTALL.md)**.
 
 ## Features
 
