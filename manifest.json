@@ -22,7 +22,8 @@
     "permissions": [
       "storage",
       "scripting",
-      "activeTab"
+      "activeTab",
+      "windows"
     ],
     "host_permissions": [
       "https://byui.instructure.com/*"

@@ -23,6 +23,12 @@ const clickableScripts = [
     name: "Unlock Blueprint Items", 
     description:"Unlocks every blueprint item present in the page. Only works in a list of items where the lock button is present (modules, assignments, quizzes, etc).", 
     file: "content/clickables/BlueprintUnlock/blueprintUnlock.js" 
+  },
+  {
+    id: "copyAllBrokenLinks", 
+    name: "Copy All Broken Links", 
+    description: "Displays a window with all broken links in the course and allows you to copy them to the clipboard.",
+    file: "content/clickables/CopyBrokenLinks/copyBrokenLinks.js"
   }
   // Add more clickable scripts as needed
 ];
@@ -224,6 +230,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   } else if (msg.action === "getMasterLists") {
     // New endpoint to provide the master lists for both clickable and display scripts.
     sendResponse({ clickableScripts, displayScripts });
+  } else if(msg.action === "showBrokenLinksPopup") {
+    const popupURL = chrome.runtime.getURL('content/clickables/CopyBrokenLinks/copyAllBrokenLinksPopup.html');
+    chrome.windows.create({
+      type: 'popup',
+      url: popupURL,
+      width: 980,
+      height: 470,
+      focused: true
+    });
   }
 });
 
