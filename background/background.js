@@ -23,6 +23,12 @@ const clickableScripts = [
     name: "Unlock Blueprint Items", 
     description:"Unlocks every blueprint item present in the page. Only works in a list of items where the lock button is present (modules, assignments, quizzes, etc).", 
     file: "content/clickables/BlueprintUnlock/blueprintUnlock.js" 
+  },
+  {
+    id: "copyAllBrokenLinks", 
+    name: "Copy All Broken Links", 
+    description: "Displays a window with all broken links in the course and allows you to copy them to the clipboard.",
+    file: "content/clickables/CopyBrokenLinks/copyBrokenLinks.js"
   }
   // Add more clickable scripts as needed
 ];
