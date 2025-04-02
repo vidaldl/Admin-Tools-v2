@@ -95,7 +95,8 @@ function populateData(Titles1, PageUrlArray1, BrokenLinkArray1, CurrentUrl) {
   let linkTextTextarea = document.getElementById("page_urls");
   let brokenLinkTextArea = document.getElementById("broken_links");
   
-
+  // loading state
+  reasonTextArea.value = "Loading...";
   //turns all the arrays to a string
   titlesTextArea.value = Titles.join("\n");
   linkTextTextarea.value = PageUrlArray.join("\n");

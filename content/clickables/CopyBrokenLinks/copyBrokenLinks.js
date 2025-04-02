@@ -35,20 +35,26 @@ function scrape() {
     brokenLinkLocations
 
   ) {
-    
+    const popupURL = chrome.runtime.getURL('content/clickables/CopyBrokenLinks/copyAllBrokenLinksPopup.html');
     chrome.storage.local.set({
         brokenLinksPageUrls: arrayOfPageUrls,
         brokenLinksURLS: arrayOfBrokenLinks,
         brokenLinksTitles: arrayOfLinkTitles,
         courseName:courseName,
-        brokenLinksLocations: brokenLinkLocations
-    }, function() {
-        chrome.windows.create({
-            type: 'popup',
-            url: './scripts/copyAllBrokenLinks/copyAllBrokenLinksPopup.html',
-            width: 980,
-            height: 470
+        brokenLinksLocations: brokenLinkLocations,
+        currentUrl: window.location.href
+    }).then(() => {
+        console.log("Data stored in local storage.");
+        console.log("Page URLs: ", arrayOfPageUrls);
+        console.log("Broken Links: ", arrayOfBrokenLinks);
+        console.log("Broken Link Titles: ", arrayOfLinkTitles);
+        console.log("Course Name: ", courseName);
+        console.log("Broken Link Locations: ", brokenLinkLocations);
+        // Send a message to the background script to open the popup
+        chrome.runtime.sendMessage({
+            action: "showBrokenLinksPopup"
         });
+        
     });
   }
 }

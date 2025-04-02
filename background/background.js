@@ -230,6 +230,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   } else if (msg.action === "getMasterLists") {
     // New endpoint to provide the master lists for both clickable and display scripts.
     sendResponse({ clickableScripts, displayScripts });
+  } else if(msg.action === "showBrokenLinksPopup") {
+    const popupURL = chrome.runtime.getURL('content/clickables/CopyBrokenLinks/copyAllBrokenLinksPopup.html');
+    chrome.windows.create({
+      type: 'popup',
+      url: popupURL,
+      width: 980,
+      height: 470,
+      focused: true
+    });
   }
 });
 
