@@ -76,6 +76,7 @@ function scrape() {
 function selectCourseName() {
   let courseNameObj = document.getElementsByClassName("ellipsible");
   let fullCourseName = courseNameObj[1].innerText;
+  console.log("Full Course Name: ", fullCourseName);
   function getCourseName(fullCourseName) {
     const typeBlock = " (Block)";
     const regex = /\b\w+\s\d+\w?\b/;
@@ -85,7 +86,7 @@ function selectCourseName() {
       return courseName;
     }
     const match = fullCourseName.match(regex);
-    return match[0];
+    return match ? match[0]: fullCourseName;
   }
 
   let courseName = getCourseName(fullCourseName);
