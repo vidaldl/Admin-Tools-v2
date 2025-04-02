@@ -1,0 +1,103 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    margin:10px;
+}
+
+body,html{
+    height:100%;
+    min-width: 927px;
+    min-height: 460px;
+}
+
+.header h2{
+    background-color: black;
+    color:white;
+    margin-left:10px;
+    margin-top: 10px;
+    margin-right: 10px;
+    min-width: 927px;
+}
+
+.header{
+    height: 30px;
+}
+
+.mainContainer{
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-gap: 10px;
+    padding: 10px;
+    padding-bottom: 10px;
+    min-height: calc(100vh - 30px - 80px);
+    grid-template-rows: 1fr;
+    align-items: start;
+}
+
+.card{
+    display: grid;
+    grid-template-rows: 1fr 60vh 1fr;
+    gap:5px;
+    border-radius: 8px;
+}
+
+
+.course_name{
+    grid-column: 1/2;
+    grid-row:  1/2;
+}
+
+
+
+h2{
+    color:white;
+    text-align: center;
+    text-justify: center;
+    background-color: #007bff;
+    border-radius: 5px;
+}
+
+.textarea{
+    resize: none;
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.buttons_all {
+    position: relative;
+    width:100%;
+    padding:0;
+    display:flex;
+    box-sizing:border-box;
+    justify-content: center;
+    height: 40px;
+    /*height: 20;*/
+    /*margin-top: auto;*/
+    
+}
+
+.copy-all-button {
+    padding: 12px 50px; /* Ensures the button is visibly long enough */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin:0;
+    min-width: 927px;
+}
+
+.copy-all-button:hover {
+    background-color: #0056b3; /* Darker shade on hover for buttons */
+}
+
+.copy-all-button:active{
+    background-color: #007bff;
+}
