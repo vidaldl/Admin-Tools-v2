@@ -44,12 +44,6 @@ function scrape() {
         brokenLinksLocations: brokenLinkLocations,
         currentUrl: window.location.href
     }).then(() => {
-        console.log("Data stored in local storage.");
-        console.log("Page URLs: ", arrayOfPageUrls);
-        console.log("Broken Links: ", arrayOfBrokenLinks);
-        console.log("Broken Link Titles: ", arrayOfLinkTitles);
-        console.log("Course Name: ", courseName);
-        console.log("Broken Link Locations: ", brokenLinkLocations);
         // Send a message to the background script to open the popup
         chrome.runtime.sendMessage({
             action: "showBrokenLinksPopup"
