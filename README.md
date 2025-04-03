@@ -11,6 +11,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Delete All Quiz Questions](#delete-all-quiz-questions)
     - [Lock Blueprint Items](#lock-blueprint-items)
     - [Unlock Blueprint Items](#unlock-blueprint-items)
+    - [Copy Broken Links](#copy-broken-links)
   - [Displays](#displays)
     - [Sections Column](#sections-column)
     - [Sections in Breadcrumbs](#sections-in-breadcrumbs)
@@ -62,6 +63,19 @@ Unlocks every blueprint item present on the page.
 1. Navigate to a page with blueprint items (e.g., modules, assignments).  
 2. Open the extension popup.  
 3. Click the **Unlock Blueprint Items** button.
+
+#### Copy Broken Links
+<img alt="Unlock Blueprint Items" src="content/clickables/CopyBrokenLinks/CopyBrokenLinks.png" width="300">
+
+<img alt="Unlock Blueprint Items" src="content/clickables/CopyBrokenLinks/CopyBrokenLinks-2.png" width="400">
+
+Displays a window with all broken links in the course and allows you to copy them to the clipboard.
+
+**Usage:**
+1. Navigate to the Course Link Validator of any course 
+2. Open the extension popup.  
+3. Click the **Copy All Broken Links** button.
+4. Copy individual columns or all of them by clickinng on **Copy All**. They are formatted to be pasted in a spreadsheet as columns and rows.
 
 ### Displays
 
