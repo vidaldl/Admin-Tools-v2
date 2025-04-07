@@ -19,6 +19,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Blueprint Parent Link](#blueprint-parent-link)
     - [Blueprint Associated Sections](#blueprint-associated-sections)
     - [Select All Files Button](#select-all-files-button)
+    - [Sort Navigation Button](#sort-navigation-button)
 - [Options](#options)
 - [Contributing](#contributing)
 - [License](#license)
