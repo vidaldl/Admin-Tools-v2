@@ -89,7 +89,7 @@ const displayScripts = [
     file: "content/displays/SortNavigation/displaySortNavigation.js",
     matches: ["https://*.instructure.com/courses/*/settings", "https://*.instructure.com/courses/*/details"],
     name: "Sort Navigation Button",
-    description: `Adds a "Sort Navigation" button to the "Navigation" tab in the course settings page in Canvas.`,
+    description: `Adds a "Sort Navigation" button to the "Navigation" tab's disabled items in the course settings page in Canvas.`,
     runAt: "document_idle"
   }
   // Add additional display scripts as needed
