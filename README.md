@@ -135,6 +135,15 @@ Adds a **Select All** button to the Files page in Canvas.
 1. Navigate to the Files page of a course.  
 2. The **Select All** button is automatically added.
 
+#### Sort Navigation Button
+<img alt="Sort Navigation Button" src="content/displays/SortNavigation/SortNavigation.png" width="400">
+
+Adds a **Sort** button to the Files page in Canvas.
+
+**Usage:**
+1. Navigate to the Settings page of a course in the **Navigation** tab.  
+2. Click **Sort** button and it will alphabetically sort the disabled items of the navigation.
+
 ## Options
 
 The extension offers an options page to enable or disable specific clickables and displays.
