@@ -1,6 +1,10 @@
 # Changelog
 
 # Changelog
+## [2.2.0] - 2025-04-07
+### Added
+- Added "Sort Navigation" functionality that sorts all of the disabled navigation items in a course when clicked.
+
 ## [2.1.0] - 2025-04-04
 ### Added
 - Added "Copy All Broken Links" functionality that opens a new window with the formatted and ready to copy broken links for a course.

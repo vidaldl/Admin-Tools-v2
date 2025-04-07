@@ -19,6 +19,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Blueprint Parent Link](#blueprint-parent-link)
     - [Blueprint Associated Sections](#blueprint-associated-sections)
     - [Select All Files Button](#select-all-files-button)
+    - [Sort Navigation Button](#sort-navigation-button)
 - [Options](#options)
 - [Contributing](#contributing)
 - [License](#license)
@@ -134,6 +135,15 @@ Adds a **Select All** button to the Files page in Canvas.
 **Usage:**
 1. Navigate to the Files page of a course.  
 2. The **Select All** button is automatically added.
+
+#### Sort Navigation Button
+<img alt="Sort Navigation Button" src="content/displays/SortNavigation/SortNavigation.png" width="400">
+
+Adds a **Sort** button to the Files page in Canvas.
+
+**Usage:**
+1. Navigate to the Settings page of a course in the **Navigation** tab.  
+2. Click **Sort** button and it will alphabetically sort the disabled items of the navigation.
 
 ## Options
 
