@@ -231,6 +231,37 @@ async function SearchInCourse(){
         marginBottom: '10px'
       });
 
+      // Create checkbox container for horizontal alignment
+      const checkboxContainer = document.createElement('div');
+      Object.assign(checkboxContainer.style, {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: '10px 0'
+      });
+      
+      // Create checkbox for HTML search
+      const htmlCheckbox = document.createElement('input');
+      htmlCheckbox.type = 'checkbox';
+      htmlCheckbox.id = 'search-html-checkbox';
+      Object.assign(htmlCheckbox.style, {
+        margin: '0 5px 0 0'
+      });
+      
+      // Create label for the checkbox
+      const htmlCheckboxLabel = document.createElement('label');
+      htmlCheckboxLabel.htmlFor = 'search-html-checkbox';
+      htmlCheckboxLabel.textContent = 'Search HTML';
+      Object.assign(htmlCheckboxLabel.style, {
+        fontSize: '0.9em',
+        color: '#555',
+        cursor: 'pointer'
+      });
+      
+      // Assemble checkbox and label
+      checkboxContainer.appendChild(htmlCheckbox);
+      checkboxContainer.appendChild(htmlCheckboxLabel);
+      
       const queryStatus = document.createElement('p');
       queryStatus.textContent = 'Query too short.';
       Object.assign(queryStatus.style, {
@@ -252,6 +283,7 @@ async function SearchInCourse(){
       content.appendChild(promptText);
       content.appendChild(subText);
       content.appendChild(searchInput);
+      content.appendChild(checkboxContainer); // Add checkbox container
       content.appendChild(queryStatus);
       content.appendChild(resultsContainer); // Add results container
 
@@ -284,7 +316,11 @@ async function SearchInCourse(){
         queryStatus.textContent = 'Searching...'; 
         
         searchTimeout = setTimeout(() => {
-            const searchResults = window.searchCourseContent(searchTerm, false); 
+            // Get the checkbox state to determine if we should search HTML content
+            const searchHTML = htmlCheckbox.checked;
+            const searchResults = window.searchCourseContent(searchTerm, searchHTML); // Pass checkbox state
+            console.log('searchHTML: ', searchHTML)
+            console.log('searchResults: ', searchResults)
             displayResults(searchResults, searchTerm, resultsContainer, getCourseID());
             if (resultsContainer.innerHTML === '' && !(searchTerm.length < 3 && !searchTerm.includes('*'))) {
                 // If displayResults didn't add anything (e.g. no results found message was cleared by mistake)
@@ -295,6 +331,16 @@ async function SearchInCourse(){
             }
             // If query is too short, message is already set
         }, 300); // Debounce search input
+      });
+      
+      // Also trigger search when checkbox changes (if there's already a search term)
+      htmlCheckbox.addEventListener('change', () => {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm.length >= 3 || searchTerm.includes('*')) {
+          // Manually trigger input event to refresh search results
+          const inputEvent = new Event('input', { bubbles: true });
+          searchInput.dispatchEvent(inputEvent);
+        }
       });
     }
 
