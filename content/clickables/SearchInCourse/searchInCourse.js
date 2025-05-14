@@ -162,16 +162,16 @@ async function SearchInCourse(){
         fontSize: '1.5em'
       });
       
-      const tutorialButton = document.createElement('button');
-      tutorialButton.textContent = 'Show Tutorial';
-      Object.assign(tutorialButton.style, {
-          background: 'white',
-          color: '#333',
-          border: '1px solid #ccc',
-          padding: '5px 10px',
-          borderRadius: '4px',
-          cursor: 'pointer'
-      });
+    //   const tutorialButton = document.createElement('button');
+    //   tutorialButton.textContent = 'Show Tutorial';
+    //   Object.assign(tutorialButton.style, {
+    //       background: 'white',
+    //       color: '#333',
+    //       border: '1px solid #ccc',
+    //       padding: '5px 10px',
+    //       borderRadius: '4px',
+    //       cursor: 'pointer'
+    //   });
 
       const closeButton = document.createElement('button');
       closeButton.innerHTML = '&times;'; // X character
@@ -191,7 +191,7 @@ async function SearchInCourse(){
           display: 'flex',
           alignItems: 'center'
       });
-      headerControls.appendChild(tutorialButton);
+    //   headerControls.appendChild(tutorialButton);
       headerControls.appendChild(closeButton);
       header.appendChild(headerControls);
 
@@ -344,16 +344,29 @@ async function SearchInCourse(){
       });
     }
 
+    // Add this helper function to escape HTML for display
+    function escapeHTML(html) {
+        return html
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function displayResults(results, searchTerm, container, courseID) {
-      container.innerHTML = ''; // Clear previous results (e.g. "No matches found")
+      container.innerHTML = ''; // Clear previous results
       let totalMatches = 0;
+      const searchHTML = document.getElementById('search-html-checkbox').checked;
 
       const courseURL = `/courses/${courseID}`;
 
       for (const [section, items] of Object.entries(results)) {
-        const matchedItems = items.filter(item => { // Ensure items actually contain the term
+        const matchedItems = items.filter(item => {
             const lowerTerm = searchTerm.toLowerCase();
-            const hay = `${item.title||''} ${stripHTML(item.body)||''}`.toLowerCase();
+            const hay = searchHTML 
+                ? `${item.title||''} ${item.body||''}`.toLowerCase()
+                : `${item.title||''} ${stripHTML(item.body)||''}`.toLowerCase();
             return hay.includes(lowerTerm);
         });
 
@@ -423,9 +436,28 @@ async function SearchInCourse(){
             listItem.appendChild(titleLink);
 
 
-            // Excerpt
+            // Excerpt modification for HTML search
             if (item.body) {
-              const excerpt = createExcerpt(stripHTML(item.body), searchTerm, 120);
+              let bodyText;
+              let excerpt;
+              
+              if (searchHTML) {
+                // For HTML search, escape the HTML to display as text
+                bodyText = item.body;
+                excerpt = createExcerpt(bodyText, searchTerm, 120);
+                
+                // Escape HTML after creating the excerpt with proper highlighting
+                // but before setting it as innerHTML
+                excerpt = escapeHTML(excerpt);
+                
+                // Re-add the highlighting that was escaped
+                excerpt = excerpt.replace(/&lt;mark&gt;/g, '<mark>').replace(/&lt;\/mark&gt;/g, '</mark>');
+              } else {
+                // For regular search, continue with current behavior
+                bodyText = stripHTML(item.body);
+                excerpt = createExcerpt(bodyText, searchTerm, 120);
+              }
+              
               const excerptPara = document.createElement('p');
               excerptPara.innerHTML = excerpt; 
               Object.assign(excerptPara.style, {
