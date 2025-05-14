@@ -136,7 +136,8 @@ async function SearchInCourse(){
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
         width: '600px', // Adjusted width
         maxWidth: '90%',
-        position: 'relative' // For close button positioning
+        position: 'relative', // For close button positioning
+        paddingBottom: '40px' // Added padding to the bottom
       });
 
       const header = document.createElement('div');
