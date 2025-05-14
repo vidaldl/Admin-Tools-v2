@@ -123,7 +123,8 @@ async function SearchInCourse(){
         justifyContent: 'center',
         alignItems: 'flex-start', // Align to the top
         zIndex: '10000', 
-        paddingTop: '50px' // Add some padding from the top
+        paddingTop: '50px', // Add some padding from the top
+        overflowY: 'auto' // Allow scrolling for long results
       });
 
       const modal = document.createElement('div');
@@ -143,7 +144,7 @@ async function SearchInCourse(){
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#c00', // Dark red background
+        backgroundColor: '#006EB6', // Dark red background
         color: 'white',
         padding: '10px 20px',
         marginLeft: '-20px', // Extend to edges
@@ -234,8 +235,16 @@ async function SearchInCourse(){
       Object.assign(queryStatus.style, {
         fontSize: '0.9em',
         color: '#777',
-        margin: '5px 0 0 0',
+        margin: '5px 0 10px 0', // Added bottom margin
         textAlign: 'right'
+      });
+
+      const resultsContainer = document.createElement('div');
+      resultsContainer.id = 'search-results-container';
+      Object.assign(resultsContainer.style, {
+        marginTop: '15px',
+        borderTop: '1px solid #eee',
+        paddingTop: '10px' // Adjusted padding
       });
       
       // Assemble content
@@ -243,6 +252,7 @@ async function SearchInCourse(){
       content.appendChild(subText);
       content.appendChild(searchInput);
       content.appendChild(queryStatus);
+      content.appendChild(resultsContainer); // Add results container
 
       // Assemble modal
       modal.appendChild(header);
@@ -255,21 +265,210 @@ async function SearchInCourse(){
       // Focus on the input field
       searchInput.focus();
 
-      // Add event listener for search (example)
+      // Add event listener for search
+      let searchTimeout;
       searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value;
+        clearTimeout(searchTimeout);
+        const searchTerm = searchInput.value.trim();
+        resultsContainer.innerHTML = ''; // Clear previous results
+
         if (searchTerm.length < 3 && !searchTerm.includes('*')) {
           queryStatus.textContent = 'Query too short.';
-          // Clear previous results or show message
-        } else if (searchTerm.length > 2 || searchTerm.includes('*')) {
-          queryStatus.textContent = ''; // Or "Searching..."
-          const results = window.searchCourseContent(searchTerm, false); // Assuming default is not HTML search
-          console.log('Search results:', results);
-          // Here you would update the modal to display the results
-          // For now, just logging to console
+          return;
+        } else if (searchTerm === '' && !searchTerm.includes('*')) { // Also check if empty after trim
+          queryStatus.textContent = 'Query too short.';
+          return;
         }
+        
+        queryStatus.textContent = 'Searching...'; 
+        
+        searchTimeout = setTimeout(() => {
+            const searchResults = window.searchCourseContent(searchTerm, false); 
+            displayResults(searchResults, searchTerm, resultsContainer, getCourseID());
+            if (resultsContainer.innerHTML === '' && !(searchTerm.length < 3 && !searchTerm.includes('*'))) {
+                // If displayResults didn't add anything (e.g. no results found message was cleared by mistake)
+                // and query is not "too short"
+                 queryStatus.textContent = ''; // Clear "Searching..."
+            } else if (!(searchTerm.length < 3 && !searchTerm.includes('*'))) {
+                 queryStatus.textContent = ''; // Clear "Searching..." if not "too short"
+            }
+            // If query is too short, message is already set
+        }, 300); // Debounce search input
       });
     }
+
+    function displayResults(results, searchTerm, container, courseID) {
+      container.innerHTML = ''; // Clear previous results (e.g. "No matches found")
+      let totalMatches = 0;
+
+      const courseURL = `/courses/${courseID}`;
+
+      for (const [section, items] of Object.entries(results)) {
+        const matchedItems = items.filter(item => { // Ensure items actually contain the term
+            const lowerTerm = searchTerm.toLowerCase();
+            const hay = `${item.title||''} ${stripHTML(item.body)||''}`.toLowerCase();
+            return hay.includes(lowerTerm);
+        });
+
+        if (matchedItems.length > 0) {
+          totalMatches += matchedItems.length;
+          const sectionTitleText = `${matchedItems.length} match${matchedItems.length === 1 ? '' : 'es'} in ${capitalizeFirstLetter(section)}`;
+          const sectionHeader = document.createElement('p'); // Changed to P for less emphasis than H3
+          sectionHeader.innerHTML = sectionTitleText; // Use innerHTML if you might add links/icons here later
+          Object.assign(sectionHeader.style, {
+            fontSize: '1em', // Adjusted size
+            fontWeight: 'normal', // Normal weight
+            color: '#333',
+            margin: '15px 0 8px 0',
+          });
+          container.appendChild(sectionHeader);
+
+          const list = document.createElement('ul');
+          Object.assign(list.style, {
+            listStyleType: 'none',
+            paddingLeft: '0',
+            margin: '0'
+          });
+
+          matchedItems.forEach(item => {
+            const listItem = document.createElement('li');
+            Object.assign(listItem.style, {
+              marginBottom: '12px',
+              paddingBottom: '8px',
+              borderBottom: '1px solid #f0f0f0'
+            });
+            
+            // Link to the item
+            const titleLink = document.createElement('a');
+            let itemUrl = '#'; 
+            let itemTitle = item.title || 'Untitled';
+            
+            switch(section) {
+                case 'pages':
+                    itemUrl = `${courseURL}/pages/${item.url}`;
+                    break;
+                case 'assignments':
+                    itemUrl = `${courseURL}/assignments/${item.id}`;
+                    break;
+                case 'quizzes':
+                    itemUrl = `${courseURL}/quizzes/${item.id}`;
+                    break;
+                case 'discussions':
+                    itemUrl = `${courseURL}/discussion_topics/${item.id}`;
+                    break;
+                // Syllabus is not a standard section from API like others, handle if needed
+            }
+            
+            titleLink.href = itemUrl;
+            titleLink.target = '_blank'; 
+            // The title text itself should be part of the link, then the icon
+            titleLink.innerHTML = `<strong>${capitalizeFirstLetter(section === 'pages' ? 'Page' : section.slice(0,-1))}:</strong> ${itemTitle} <span style="font-size: 0.8em;">&#x2197;</span>`;
+
+
+            Object.assign(titleLink.style, {
+              color: '#007bff',
+              textDecoration: 'none',
+              display: 'block', // Make link take full width for easier clicking
+              marginBottom: '3px'
+            });
+            titleLink.onmouseover = () => titleLink.style.textDecoration = 'underline';
+            titleLink.onmouseout = () => titleLink.style.textDecoration = 'none';
+            listItem.appendChild(titleLink);
+
+
+            // Excerpt
+            if (item.body) {
+              const excerpt = createExcerpt(stripHTML(item.body), searchTerm, 120);
+              const excerptPara = document.createElement('p');
+              excerptPara.innerHTML = excerpt; 
+              Object.assign(excerptPara.style, {
+                fontSize: '0.9em',
+                color: '#555',
+                margin: '0 0 0 15px', // Indent excerpt
+                lineHeight: '1.4'
+              });
+              listItem.appendChild(excerptPara);
+            }
+            list.appendChild(listItem);
+          });
+          container.appendChild(list);
+        }
+      }
+
+      if (totalMatches === 0) {
+        const noResultsMessage = document.createElement('p');
+        noResultsMessage.textContent = 'No matches found for your query.';
+        Object.assign(noResultsMessage.style, {
+            textAlign: 'center',
+            color: '#777',
+            marginTop: '20px'
+        });
+        container.appendChild(noResultsMessage);
+      }
+    }
+
+    function capitalizeFirstLetter(string) {
+        if (!string) return '';
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function escapeRegExp(string) {
+      if (!string) return '';
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+    }
+
+    function createExcerpt(text, term, maxLength) {
+        if (!text) return '';
+        const lowerText = text.toLowerCase();
+        const lowerTerm = term.toLowerCase(); // Use the full term for finding index initially
+    
+        let bestIndex = -1;
+        // Try to find the exact term first for centering
+        if (lowerTerm.trim() !== "") { // ensure lowerTerm is not just spaces or empty
+            bestIndex = lowerText.indexOf(lowerTerm);
+        }
+
+        // If exact term not found, or term is just wildcard, try to find a non-wildcard part
+        if (bestIndex === -1 && term.includes('*')) {
+            const parts = term.split('*').filter(p => p.length > 0);
+            for (const part of parts) {
+                const idx = lowerText.indexOf(part.toLowerCase());
+                if (idx !== -1) {
+                    bestIndex = idx;
+                    break;
+                }
+            }
+        }
+        
+        if (bestIndex === -1 && lowerTerm.trim() === "") { // If term was empty or just wildcard and no parts found
+            bestIndex = 0; 
+        } else if (bestIndex === -1) { // If no part of the term is found, just truncate from start
+             const excerpt = text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+             // Still try to highlight if the term is simple and might be found by regex
+             return term.trim() !== "" ? excerpt.replace(new RegExp(escapeRegExp(term), 'gi'), '<mark>$&</mark>') : excerpt;
+        }
+
+        const termDisplayLength = term.length; 
+        const start = Math.max(0, bestIndex - Math.floor((maxLength - termDisplayLength) / 2));
+        const end = Math.min(text.length, start + maxLength);
+        
+        let excerpt = text.substring(start, end);
+        
+        // Highlight the original search term (case-insensitive)
+        // This will highlight "sta*" if term is "sta*", or "start" if term is "start"
+        if (term.trim() !== "") {
+            excerpt = excerpt.replace(new RegExp(escapeRegExp(term), 'gi'), (match) => `<mark>${match}</mark>`);
+        }
+
+        if (start > 0) {
+            excerpt = '...' + excerpt;
+        }
+        if (end < text.length && (start + maxLength) < text.length) { // check if truncation actually happened
+            excerpt = excerpt + '...';
+        }
+        return excerpt;
+    }
+
 }
 
 
