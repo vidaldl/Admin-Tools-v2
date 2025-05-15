@@ -7,6 +7,10 @@ async function SearchInCourse(){
         return tmp.textContent || tmp.innerText || ''
     }
     
+    // Helper to add delay between requests
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
+    }
     
     // Helper to pull CSRF token from Canvas cookies
     function getCsrfToken() {
@@ -14,47 +18,119 @@ async function SearchInCourse(){
       return match ? decodeURIComponent(match[2]) : ''
     }
   
-    // Generic fetch wrapper
-    async function fetchJSON(url) {
-      const res = await fetch(url, {
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': getCsrfToken()
+    // Generic fetch wrapper with retry and error handling
+    async function fetchJSON(url, retries = 2) {
+      let delay = 500
+      
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const res = await fetch(url, {
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': getCsrfToken()
+            }
+          })
+          
+          if (res.status === 403) {
+            // Rate limited, wait and retry if we have retries left
+            if (i < retries) {
+              console.log(`Rate limited on ${url}, waiting ${delay}ms before retry ${i+1}`)
+              await new Promise(r => setTimeout(r, delay))
+              delay *= 2 // Exponential backoff
+              continue
+            }
+          }
+          
+          if (!res.ok) throw new Error(`Fetch ${url} failed: ${res.status}`)
+          return await res.json()
+        } catch (err) {
+          if (i < retries) {
+            console.log(`Error on ${url}, retrying: ${err.message}`)
+            await new Promise(r => setTimeout(r, delay))
+            delay *= 2
+            continue
+          }
+          throw err
         }
-      })
-      if (!res.ok) throw new Error(`Fetch ${url} failed: ${res.status}`)
-      return await res.json()
+      }
     }
   
-    // Endpoints
-    async function getPages(courseID) {
+    // Endpoints with limits to avoid rate issues
+    async function getPages(courseID, queryStatus) {
+      if (queryStatus) queryStatus.textContent = 'Loading pages...'
       const pages = await fetchJSON(`/api/v1/courses/${courseID}/pages?per_page=100`)
-      let foundPages =  Promise.all(pages.map(p=> fetchJSON(`/api/v1/courses/${courseID}/pages/${p.url}`)))
-        console.log('found pages: ', foundPages)
+      
+      // Remove the slice limit
+      const pagesToFetch = pages;
+      if (queryStatus) queryStatus.textContent = `Loading page details (0/${pagesToFetch.length})...`
+      
+      // Fetch pages sequentially to avoid rate limits
+      const foundPages = []
+      for (let i = 0; i < pagesToFetch.length; i++) {
+        try {
+          const page = await fetchJSON(`/api/v1/courses/${courseID}/pages/${pagesToFetch[i].url}`)
+          foundPages.push(page)
+          if (queryStatus) queryStatus.textContent = `Loading page details (${i+1}/${pagesToFetch.length})...`
+          
+          // Add a small delay between requests
+          if (i < pagesToFetch.length - 1) await delay(100)
+        } catch (err) {
+          console.error(`Error loading page ${pagesToFetch[i].url}:`, err)
+          // Continue with other pages even if one fails
+        }
+      }
+      
+      console.log(`Loaded ${foundPages.length}/${pages.length} pages`)
       return foundPages
     }
   
-    async function getAssignments(courseID) {
-      return fetchJSON(`/api/v1/courses/${courseID}/assignments?per_page=100`)
-        .then(list => list.map(a => ({ id:a.id, title:a.name, body:a.description })))
+    async function getAssignments(courseID, queryStatus) {
+      if (queryStatus) queryStatus.textContent = 'Loading assignments...'
+      const assignments = await fetchJSON(`/api/v1/courses/${courseID}/assignments?per_page=50`)
+      return assignments.map(a => ({ id:a.id, title:a.name, body:a.description }))
     }
   
-    async function getQuizzes(courseID) {
-      return fetchJSON(`/api/v1/courses/${courseID}/quizzes?per_page=100`)
-        .then(list => list.map(q => ({ id:q.id, title:q.title, body:q.description })))
+    async function getQuizzes(courseID, queryStatus) {
+      if (queryStatus) queryStatus.textContent = 'Loading quizzes...'
+      const quizzes = await fetchJSON(`/api/v1/courses/${courseID}/quizzes?per_page=50`)
+      return quizzes.map(q => ({ id:q.id, title:q.title, body:q.description }))
     }
   
-    async function getDiscussions(courseID) {
+    async function getDiscussions(courseID, queryStatus) {
+      if (queryStatus) queryStatus.textContent = 'Loading discussions...'
       const topics = await fetchJSON(`/api/v1/courses/${courseID}/discussion_topics?per_page=100`)
-      return Promise.all(topics.map(async t => {
-        // fetch first batch of entries
-        const entries = await fetchJSON(
-          `/api/v1/courses/${courseID}/discussion_topics/${t.id}/entries?per_page=100`
-        )
-        return { id:t.id, title:t.title, body:t.message, entries }
-      }))
+      
+      // Remove the slice limit
+      const topicsToFetch = topics;
+      if (queryStatus) queryStatus.textContent = `Loading discussion entries (0/${topicsToFetch.length})...`
+      
+      // Fetch discussion entries sequentially
+      const results = []
+      for (let i = 0; i < topicsToFetch.length; i++) {
+        try {
+          const entries = await fetchJSON(
+            `/api/v1/courses/${courseID}/discussion_topics/${topicsToFetch[i].id}/entries?per_page=30`
+          )
+          results.push({ 
+            id: topicsToFetch[i].id, 
+            title: topicsToFetch[i].title, 
+            body: topicsToFetch[i].message, 
+            entries 
+          })
+          if (queryStatus) queryStatus.textContent = `Loading discussion entries (${i+1}/${topicsToFetch.length})...`
+          
+          // Add a small delay between requests
+          if (i < topicsToFetch.length - 1) await delay(100)
+        } catch (err) {
+          console.error(`Error loading discussion ${topicsToFetch[i].id}:`, err)
+          // Continue with other discussions even if one fails
+        }
+      }
+      
+      console.log(`Loaded ${results.length}/${topics.length} discussions`)
+      return results
     }
   
     // Extract courseID from URL
@@ -63,20 +139,48 @@ async function SearchInCourse(){
       return m ? m[1] : null
     }
   
-    // Build global index
-    async function buildCourseContent(courseID) {
-      const [pages, assignments, quizzes, discussions] = await Promise.all([
-        getPages(courseID),
-        getAssignments(courseID),
-        getQuizzes(courseID),
-        getDiscussions(courseID)
-      ])
-      window.adminToolsCourseContent = { pages, assignments, quizzes, discussions }
-      console.log('courseContent ready', window.adminToolsCourseContent)
-      return window.adminToolsCourseContent
+    // Build global index - now sequential to avoid rate limits
+    async function buildCourseContent(courseID, queryStatus) {
+      try {
+        if (queryStatus) {
+          // Create a structured progress display for all content types
+          queryStatus.innerHTML = `
+            <div style="text-align: left; font-size: 0.9em; color: #555; margin-bottom: 8px;">
+              <div id="pages-progress">Pages: Waiting to start...</div>
+              <div id="assignments-progress">Assignments: Waiting to start...</div>
+              <div id="quizzes-progress">Quizzes: Waiting to start...</div>
+              <div id="discussions-progress">Discussions: Waiting to start...</div>
+            </div>
+          `;
+        }
+        
+        // Get references to progress elements
+        const pagesProgress = document.getElementById('pages-progress');
+        const assignmentsProgress = document.getElementById('assignments-progress');
+        const quizzesProgress = document.getElementById('quizzes-progress');
+        const discussionsProgress = document.getElementById('discussions-progress');
+        
+        // Start all content type requests in parallel
+        const [pages, assignments, quizzes, discussions] = await Promise.all([
+          getPages(courseID, pagesProgress),
+          getAssignments(courseID, assignmentsProgress),
+          getQuizzes(courseID, quizzesProgress),
+          getDiscussions(courseID, discussionsProgress)
+        ]);
+        
+        window.adminToolsCourseContent = { pages, assignments, quizzes, discussions }
+        console.log('courseContent ready', window.adminToolsCourseContent)
+        
+        if (queryStatus) queryStatus.textContent = 'Ready to search'
+        return window.adminToolsCourseContent
+      } catch (err) {
+        console.error('Error building course content:', err)
+        if (queryStatus) queryStatus.textContent = 'Error loading content. Try again later.'
+        throw err
+      }
     }
   
-    // Search helper
+    // Search helper - unchanged
     window.searchCourseContent = function(term, isHTML) {
       if (!window.adminToolsCourseContent) {
         console.warn('adminToolsCourseContent not loaded yet – call await buildCourseContent(courseID) first')
@@ -98,12 +202,23 @@ async function SearchInCourse(){
       return results
     }
   
-    // Auto-kickoff
+    // Auto-kickoff with modal display first
     const cid = getCourseID()
     if (cid) {
-      await buildCourseContent(cid)
-      // build display modal with a search bar 
-      buildSearchModal();
+      // First build the modal, then load content
+      const modal = buildSearchModal()
+      const queryStatus = modal.querySelector('p.query-status')
+      
+      // Start loading content with status updates
+      queryStatus.textContent = 'Loading course content...'
+      buildCourseContent(cid, queryStatus)
+        .then(() => {
+          queryStatus.textContent = 'Query too short.'
+        })
+        .catch(err => {
+          queryStatus.textContent = 'Error loading content. Try again later.'
+          console.error('Content loading error:', err)
+        })
     } else {
       console.warn('Cannot detect courseID in URL; call buildCourseContent(courseID) manually.')
     }
@@ -137,7 +252,7 @@ async function SearchInCourse(){
         width: '600px', // Adjusted width
         maxWidth: '90%',
         position: 'relative', // For close button positioning
-        paddingBottom: '40px' // Added padding to the bottom
+        paddingBottom: '60px' // Increased padding at the bottom
       });
 
       const header = document.createElement('div');
@@ -145,7 +260,7 @@ async function SearchInCourse(){
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#006EB6', // Dark red background
+        backgroundColor: '#006EB6', 
         color: 'white',
         padding: '10px 20px',
         marginLeft: '-20px', // Extend to edges
@@ -162,17 +277,6 @@ async function SearchInCourse(){
         fontSize: '1.5em'
       });
       
-    //   const tutorialButton = document.createElement('button');
-    //   tutorialButton.textContent = 'Show Tutorial';
-    //   Object.assign(tutorialButton.style, {
-    //       background: 'white',
-    //       color: '#333',
-    //       border: '1px solid #ccc',
-    //       padding: '5px 10px',
-    //       borderRadius: '4px',
-    //       cursor: 'pointer'
-    //   });
-
       const closeButton = document.createElement('button');
       closeButton.innerHTML = '&times;'; // X character
       Object.assign(closeButton.style, {
@@ -191,10 +295,8 @@ async function SearchInCourse(){
           display: 'flex',
           alignItems: 'center'
       });
-    //   headerControls.appendChild(tutorialButton);
       headerControls.appendChild(closeButton);
       header.appendChild(headerControls);
-
 
       const content = document.createElement('div');
       Object.assign(content.style, {
@@ -263,7 +365,8 @@ async function SearchInCourse(){
       checkboxContainer.appendChild(htmlCheckboxLabel);
       
       const queryStatus = document.createElement('p');
-      queryStatus.textContent = 'Query too short.';
+      queryStatus.textContent = 'Loading...';
+      queryStatus.classList.add('query-status'); // Add class for easier selection
       Object.assign(queryStatus.style, {
         fontSize: '0.9em',
         color: '#777',
@@ -276,7 +379,9 @@ async function SearchInCourse(){
       Object.assign(resultsContainer.style, {
         marginTop: '15px',
         borderTop: '1px solid #eee',
-        paddingTop: '10px' // Adjusted padding
+        paddingTop: '10px', // Adjusted padding
+        maxHeight: '60vh',   // Limit height to prevent super long results
+        overflowY: 'auto'    // Make results scrollable
       });
       
       // Assemble content
@@ -319,15 +424,13 @@ async function SearchInCourse(){
             // Get the checkbox state to determine if we should search HTML content
             const searchHTML = htmlCheckbox.checked;
             const searchResults = window.searchCourseContent(searchTerm, searchHTML); // Pass checkbox state
-            console.log('searchHTML: ', searchHTML)
-            console.log('searchResults: ', searchResults)
             displayResults(searchResults, searchTerm, resultsContainer, getCourseID());
+            
             if (resultsContainer.innerHTML === '' && !(searchTerm.length < 3 && !searchTerm.includes('*'))) {
-                // If displayResults didn't add anything (e.g. no results found message was cleared by mistake)
-                // and query is not "too short"
-                 queryStatus.textContent = ''; // Clear "Searching..."
+                // If displayResults didn't add anything and query is not "too short"
+                queryStatus.textContent = ''; // Clear "Searching..."
             } else if (!(searchTerm.length < 3 && !searchTerm.includes('*'))) {
-                 queryStatus.textContent = ''; // Clear "Searching..." if not "too short"
+                queryStatus.textContent = ''; // Clear "Searching..." if not "too short"
             }
             // If query is too short, message is already set
         }, 300); // Debounce search input
@@ -342,6 +445,8 @@ async function SearchInCourse(){
           searchInput.dispatchEvent(inputEvent);
         }
       });
+      
+      return modal; // Return modal for access to queryStatus
     }
 
     // Add this helper function to escape HTML for display
@@ -534,7 +639,6 @@ async function SearchInCourse(){
         let excerpt = text.substring(start, end);
         
         // Highlight the original search term (case-insensitive)
-        // This will highlight "sta*" if term is "sta*", or "start" if term is "start"
         if (term.trim() !== "") {
             excerpt = excerpt.replace(new RegExp(escapeRegExp(term), 'gi'), (match) => `<mark>${match}</mark>`);
         }
@@ -542,7 +646,7 @@ async function SearchInCourse(){
         if (start > 0) {
             excerpt = '...' + excerpt;
         }
-        if (end < text.length && (start + maxLength) < text.length) { // check if truncation actually happened
+        if (end < text.length) {
             excerpt = excerpt + '...';
         }
         return excerpt;
@@ -550,6 +654,5 @@ async function SearchInCourse(){
 
 }
 
-
-//Build the content when clickable is clicked.
+// Build the content when clickable is clicked.
 SearchInCourse();
