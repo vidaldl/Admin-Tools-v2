@@ -75,7 +75,7 @@ async function SearchInCourse(){
           if (queryStatus) queryStatus.textContent = `Loading page details (${i+1}/${pagesToFetch.length})...`
           
           // Add a small delay between requests
-          if (i < pagesToFetch.length - 1) await delay(20)
+          if (i < pagesToFetch.length - 1) await delay(0)
         } catch (err) {
           console.error(`Error loading page ${pagesToFetch[i].url}:`, err)
           // Continue with other pages even if one fails
@@ -230,8 +230,8 @@ async function SearchInCourse(){
       }
     }
   
-    // Search helper - unchanged
-    window.searchCourseContent = function(term, isHTML) {
+    // Search helper - always searches HTML content now
+    window.searchCourseContent = function(term) {
       if (!window.adminToolsCourseContent) {
         console.warn('adminToolsCourseContent not loaded yet – call await buildCourseContent(courseID) first')
         return {}
@@ -240,13 +240,9 @@ async function SearchInCourse(){
       const results = {}
       for (const [section, items] of Object.entries(window.adminToolsCourseContent)) {
         results[section] = items.filter(item => {
-            if(isHTML) {
-                const hay = `${item.title||''} ${item.body||''}`.toLowerCase()
-                return hay.includes(lower)
-            }
-            const hay = `${item.title||''} ${stripHTML(item.body)||''}`.toLowerCase()
+            // Always search in HTML content (title and body)
+            const hay = `${item.title||''} ${item.body||''}`.toLowerCase()
             return hay.includes(lower)
-          
         })
       }
       return results
@@ -380,39 +376,13 @@ async function SearchInCourse(){
         fontSize: '1em',
         border: '1px solid #ccc',
         borderRadius: '4px',
-        marginBottom: '10px'
+        marginBottom: '10px' // Keep margin for spacing
       });
 
-      // Create checkbox container for horizontal alignment
-      const checkboxContainer = document.createElement('div');
-      Object.assign(checkboxContainer.style, {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: '10px 0'
-      });
-      
-      // Create checkbox for HTML search
-      const htmlCheckbox = document.createElement('input');
-      htmlCheckbox.type = 'checkbox';
-      htmlCheckbox.id = 'search-html-checkbox';
-      Object.assign(htmlCheckbox.style, {
-        margin: '0 5px 0 0'
-      });
-      
-      // Create label for the checkbox
-      const htmlCheckboxLabel = document.createElement('label');
-      htmlCheckboxLabel.htmlFor = 'search-html-checkbox';
-      htmlCheckboxLabel.textContent = 'Search HTML';
-      Object.assign(htmlCheckboxLabel.style, {
-        fontSize: '0.9em',
-        color: '#555',
-        cursor: 'pointer'
-      });
-      
-      // Assemble checkbox and label
-      checkboxContainer.appendChild(htmlCheckbox);
-      checkboxContainer.appendChild(htmlCheckboxLabel);
+      // REMOVE Checkbox container, checkbox, and label elements
+      // const checkboxContainer = document.createElement('div'); ...
+      // const htmlCheckbox = document.createElement('input'); ...
+      // const htmlCheckboxLabel = document.createElement('label'); ...
       
       const queryStatus = document.createElement('p');
       queryStatus.textContent = 'Loading...';
@@ -438,7 +408,7 @@ async function SearchInCourse(){
       content.appendChild(promptText);
       content.appendChild(subText);
       content.appendChild(searchInput);
-      content.appendChild(checkboxContainer); // Add checkbox container
+      // REMOVE: content.appendChild(checkboxContainer); 
       content.appendChild(queryStatus);
       content.appendChild(resultsContainer); // Add results container
 
@@ -471,30 +441,21 @@ async function SearchInCourse(){
         queryStatus.textContent = 'Searching...'; 
         
         searchTimeout = setTimeout(() => {
-            // Get the checkbox state to determine if we should search HTML content
-            const searchHTML = htmlCheckbox.checked;
-            const searchResults = window.searchCourseContent(searchTerm, searchHTML); // Pass checkbox state
+            // Always search HTML, checkbox state is no longer needed
+            const searchResults = window.searchCourseContent(searchTerm); 
             displayResults(searchResults, searchTerm, resultsContainer, getCourseID());
             
+            // Clear "Searching..." message logic (simplified as checkbox is gone)
             if (resultsContainer.innerHTML === '' && !(searchTerm.length < 3 && !searchTerm.includes('*'))) {
-                // If displayResults didn't add anything and query is not "too short"
-                queryStatus.textContent = ''; // Clear "Searching..."
+                queryStatus.textContent = ''; 
             } else if (!(searchTerm.length < 3 && !searchTerm.includes('*'))) {
-                queryStatus.textContent = ''; // Clear "Searching..." if not "too short"
+                queryStatus.textContent = ''; 
             }
             // If query is too short, message is already set
         }, 300); // Debounce search input
       });
       
-      // Also trigger search when checkbox changes (if there's already a search term)
-      htmlCheckbox.addEventListener('change', () => {
-        const searchTerm = searchInput.value.trim();
-        if (searchTerm.length >= 3 || searchTerm.includes('*')) {
-          // Manually trigger input event to refresh search results
-          const inputEvent = new Event('input', { bubbles: true });
-          searchInput.dispatchEvent(inputEvent);
-        }
-      });
+      // REMOVE: htmlCheckbox.addEventListener('change', ...);
       
       return modal; // Return modal for access to queryStatus
     }
@@ -512,18 +473,13 @@ async function SearchInCourse(){
     function displayResults(results, searchTerm, container, courseID) {
       container.innerHTML = ''; // Clear previous results
       let totalMatches = 0;
-      const searchHTML = document.getElementById('search-html-checkbox').checked;
+      // searchHTML variable is no longer needed here as search is always HTML based on searchCourseContent
 
       const courseURL = `/courses/${courseID}`;
 
       for (const [section, items] of Object.entries(results)) {
-        const matchedItems = items.filter(item => {
-            const lowerTerm = searchTerm.toLowerCase();
-            const hay = searchHTML 
-                ? `${item.title||''} ${item.body||''}`.toLowerCase()
-                : `${item.title||''} ${stripHTML(item.body)||''}`.toLowerCase();
-            return hay.includes(lowerTerm);
-        });
+        // Items are already filtered by searchCourseContent to include only those matching the term in HTML
+        const matchedItems = items; 
 
         if (matchedItems.length > 0) {
           totalMatches += matchedItems.length;
@@ -549,8 +505,12 @@ async function SearchInCourse(){
             const listItem = document.createElement('li');
             Object.assign(listItem.style, {
               marginBottom: '12px',
-              paddingBottom: '8px',
-              borderBottom: '1px solid #f0f0f0'
+              paddingTop: '5px', // Add some padding for background visibility
+              paddingBottom: '8px', // Keep existing paddingBottom
+              paddingLeft: '8px',   // Add horizontal padding
+              paddingRight: '8px',  // Add horizontal padding
+              borderBottom: '1px solid #f0f0f0',
+              borderRadius: '4px' // Slight rounding for background effect
             });
             
             // Link to the item
@@ -591,27 +551,10 @@ async function SearchInCourse(){
             listItem.appendChild(titleLink);
 
 
-            // Excerpt modification for HTML search
+            // Excerpt modification based on new logic
             if (item.body) {
-              let bodyText;
-              let excerpt;
-              
-              if (searchHTML) {
-                // For HTML search, escape the HTML to display as text
-                bodyText = item.body;
-                excerpt = createExcerpt(bodyText, searchTerm, 120);
-                
-                // Escape HTML after creating the excerpt with proper highlighting
-                // but before setting it as innerHTML
-                excerpt = escapeHTML(excerpt);
-                
-                // Re-add the highlighting that was escaped
-                excerpt = excerpt.replace(/&lt;mark&gt;/g, '<mark>').replace(/&lt;\/mark&gt;/g, '</mark>');
-              } else {
-                // For regular search, continue with current behavior
-                bodyText = stripHTML(item.body);
-                excerpt = createExcerpt(bodyText, searchTerm, 120);
-              }
+              // createExcerpt now returns an object: { excerpt: "...", matchInTagContext: true/false }
+              const { excerpt, matchInTagContext } = createExcerpt(item.body, searchTerm, 120);
               
               const excerptPara = document.createElement('p');
               excerptPara.innerHTML = excerpt; 
@@ -622,6 +565,11 @@ async function SearchInCourse(){
                 lineHeight: '1.4'
               });
               listItem.appendChild(excerptPara);
+
+              // Highlight row if match was in HTML tag context
+              if (matchInTagContext) {
+                listItem.style.backgroundColor = '#e9ecef'; // A light, neutral gray
+              }
             }
             list.appendChild(listItem);
           });
@@ -651,55 +599,95 @@ async function SearchInCourse(){
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
-    function createExcerpt(text, term, maxLength) {
-        if (!text) return '';
-        const lowerText = text.toLowerCase();
-        const lowerTerm = term.toLowerCase(); // Use the full term for finding index initially
-    
-        let bestIndex = -1;
-        // Try to find the exact term first for centering
-        if (lowerTerm.trim() !== "") { // ensure lowerTerm is not just spaces or empty
-            bestIndex = lowerText.indexOf(lowerTerm);
-        }
+    // Helper function to check if a specific index in an HTML string is effectively inside a tag's definition
+    function isIndexEffectivelyInTag(htmlString, targetIndex) {
+        if (!htmlString || targetIndex < 0 || targetIndex >= htmlString.length) return false;
+        
+        let currentlyInTagDefinition = false;
+        for (let i = 0; i < htmlString.length; i++) {
+            if (htmlString[i] === '<') {
+                // This is a simplified check. It doesn't handle comments or CDATA sections
+                // containing '<' or '>' characters, or script/style tags with '<' or '>'.
+                currentlyInTagDefinition = true;
+            }
+            
+            if (i === targetIndex) {
+                // The state of currentlyInTagDefinition when we reach the targetIndex
+                // determines if targetIndex itself is part of a tag.
+                return currentlyInTagDefinition;
+            }
 
-        // If exact term not found, or term is just wildcard, try to find a non-wildcard part
-        if (bestIndex === -1 && term.includes('*')) {
-            const parts = term.split('*').filter(p => p.length > 0);
-            for (const part of parts) {
-                const idx = lowerText.indexOf(part.toLowerCase());
-                if (idx !== -1) {
-                    bestIndex = idx;
-                    break;
-                }
+            if (htmlString[i] === '>') {
+                 // If we passed a '>', we are no longer in that specific tag's definition 
+                 // for subsequent characters, unless a new tag starts.
+                currentlyInTagDefinition = false;
             }
         }
-        
-        if (bestIndex === -1 && lowerTerm.trim() === "") { // If term was empty or just wildcard and no parts found
-            bestIndex = 0; 
-        } else if (bestIndex === -1) { // If no part of the term is found, just truncate from start
-             const excerpt = text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-             // Still try to highlight if the term is simple and might be found by regex
-             return term.trim() !== "" ? excerpt.replace(new RegExp(escapeRegExp(term), 'gi'), '<mark>$&</mark>') : excerpt;
+        // This line should ideally not be reached if targetIndex is within bounds,
+        // as the return inside the loop should catch it.
+        return false; 
+    }
+
+
+    function createExcerpt(rawHtmlBody, term, maxLength) {
+        if (!rawHtmlBody || !term) return { excerpt: '', matchInTagContext: false };
+
+        const lowerBody = rawHtmlBody.toLowerCase();
+        const lowerTerm = term.toLowerCase();
+        const matchIndex = lowerBody.indexOf(lowerTerm);
+
+        if (matchIndex === -1) {
+            // This case should ideally not be hit if called for items already confirmed to match.
+            // Provides a fallback just in case.
+            let fallbackExcerpt = rawHtmlBody.substring(0, maxLength);
+            if (rawHtmlBody.length > maxLength) fallbackExcerpt += '...';
+            // Escape, as context is unknown, safer to treat as potential HTML that needs escaping.
+            return { excerpt: escapeHTML(fallbackExcerpt), matchInTagContext: false };
         }
 
-        const termDisplayLength = term.length; 
-        const start = Math.max(0, bestIndex - Math.floor((maxLength - termDisplayLength) / 2));
-        const end = Math.min(text.length, start + maxLength);
+        // Get the actual matched term from the original rawHtmlBody to preserve casing
+        const actualMatchedTerm = rawHtmlBody.substring(matchIndex, matchIndex + term.length);
         
-        let excerpt = text.substring(start, end);
+        // Determine if the start of the match is within an HTML tag's definition
+        const matchIsInsideTagDefinition = isIndexEffectivelyInTag(rawHtmlBody, matchIndex);
+
+        const contextChars = Math.floor((maxLength - actualMatchedTerm.length) / 2);
+        const excerptStart = Math.max(0, matchIndex - contextChars);
+        const excerptEnd = Math.min(rawHtmlBody.length, matchIndex + actualMatchedTerm.length + contextChars);
         
-        // Highlight the original search term (case-insensitive)
-        if (term.trim() !== "") {
-            excerpt = excerpt.replace(new RegExp(escapeRegExp(term), 'gi'), (match) => `<mark>${match}</mark>`);
+        let currentExcerptSegment = rawHtmlBody.substring(excerptStart, excerptEnd);
+        let finalDisplayExcerpt;
+
+        if (matchIsInsideTagDefinition) {
+            // Match is in HTML tag: display as HTML code, highlight term
+            // Highlight the actual matched term (preserving its original case)
+            let highlightedExcerpt = currentExcerptSegment.replace(
+                new RegExp(escapeRegExp(actualMatchedTerm), 'gi'), 
+                (match) => `<mark>${match}</mark>`
+            );
+            // Escape the HTML in the excerpt for safe display, then re-insert <mark> tags
+            finalDisplayExcerpt = escapeHTML(highlightedExcerpt);
+            finalDisplayExcerpt = finalDisplayExcerpt.replace(/&lt;mark&gt;/g, '<mark>').replace(/&lt;\/mark&gt;/g, '</mark>');
+        } else {
+            // Match is in text content: display as stripped text, highlight term
+            // Strip HTML from the current segment to get the text content
+            const textOnlySegment = stripHTML(currentExcerptSegment);
+            // Highlight the original search term (case-insensitive) on the stripped text
+            finalDisplayExcerpt = textOnlySegment.replace(
+                new RegExp(escapeRegExp(term), 'gi'), 
+                (match) => `<mark>${match}</mark>`
+            );
         }
 
-        if (start > 0) {
-            excerpt = '...' + excerpt;
+        // Add ellipses if the excerpt is truncated
+        if (excerptStart > 0) {
+            finalDisplayExcerpt = '...' + finalDisplayExcerpt;
         }
-        if (end < text.length) {
-            excerpt = excerpt + '...';
+        if (excerptEnd < rawHtmlBody.length) {
+            finalDisplayExcerpt = finalDisplayExcerpt + '...';
         }
-        return excerpt;
+
+        return { excerpt: finalDisplayExcerpt, matchInTagContext: matchIsInsideTagDefinition };
     }
 
 }
