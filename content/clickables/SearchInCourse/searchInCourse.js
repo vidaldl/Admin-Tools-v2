@@ -470,15 +470,29 @@ async function SearchInCourse(){
             .replace(/'/g, '&#039;');
     }
 
+    // NEW Helper function to find all occurrences of a substring
+    function getAllMatchIndices(text, searchTerm) {
+        const indices = [];
+        if (!text || !searchTerm) return indices;
+        const lowerText = text.toLowerCase();
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        let startIndex = 0;
+        let index = lowerText.indexOf(lowerSearchTerm, startIndex);
+        while (index > -1) {
+            indices.push(index);
+            startIndex = index + lowerSearchTerm.length;
+            index = lowerText.indexOf(lowerSearchTerm, startIndex);
+        }
+        return indices;
+    }
+
     function displayResults(results, searchTerm, container, courseID) {
       container.innerHTML = ''; // Clear previous results
       let totalMatches = 0;
-      // searchHTML variable is no longer needed here as search is always HTML based on searchCourseContent
 
       const courseURL = `/courses/${courseID}`;
 
       for (const [section, items] of Object.entries(results)) {
-        // Items are already filtered by searchCourseContent to include only those matching the term in HTML
         const matchedItems = items; 
 
         if (matchedItems.length > 0) {
@@ -505,15 +519,14 @@ async function SearchInCourse(){
             const listItem = document.createElement('li');
             Object.assign(listItem.style, {
               marginBottom: '12px',
-              paddingTop: '5px', // Add some padding for background visibility
-              paddingBottom: '8px', // Keep existing paddingBottom
-              paddingLeft: '8px',   // Add horizontal padding
-              paddingRight: '8px',  // Add horizontal padding
+              paddingTop: '5px', 
+              paddingBottom: '8px', 
+              paddingLeft: '8px',   
+              paddingRight: '8px',  
               borderBottom: '1px solid #f0f0f0',
-              borderRadius: '4px' // Slight rounding for background effect
+              borderRadius: '4px' 
             });
             
-            // Link to the item
             const titleLink = document.createElement('a');
             let itemUrl = '#'; 
             let itemTitle = item.title || 'Untitled';
@@ -550,25 +563,48 @@ async function SearchInCourse(){
             titleLink.onmouseout = () => titleLink.style.textDecoration = 'none';
             listItem.appendChild(titleLink);
 
+            // Excerpt modification for multiple occurrences
+            if (item.body && item.body.trim() !== '') {
+              const matchIndices = getAllMatchIndices(item.body, searchTerm);
+              let itemHasOverallTagMatch = false;
 
-            // Excerpt modification based on new logic
-            if (item.body) {
-              // createExcerpt now returns an object: { excerpt: "...", matchInTagContext: true/false }
-              const { excerpt, matchInTagContext } = createExcerpt(item.body, searchTerm, 120);
-              
-              const excerptPara = document.createElement('p');
-              excerptPara.innerHTML = excerpt; 
-              Object.assign(excerptPara.style, {
-                fontSize: '0.9em',
-                color: '#555',
-                margin: '0 0 0 15px', // Indent excerpt
-                lineHeight: '1.4'
-              });
-              listItem.appendChild(excerptPara);
+              if (matchIndices.length > 0) {
+                const excerptsWrapper = document.createElement('div');
+                Object.assign(excerptsWrapper.style, {
+                    marginLeft: '15px', // Indent excerpts container
+                    marginTop: '5px'
+                });
 
-              // Highlight row if match was in HTML tag context
-              if (matchInTagContext) {
-                listItem.style.backgroundColor = '#e9ecef'; // A light, neutral gray
+                matchIndices.forEach((matchIdx, i) => {
+                  // Pass item.body (original case) and the specific matchIndex
+                  const { excerpt, matchInTagContext } = createExcerpt(item.body, searchTerm, 120, matchIdx);
+                  
+                  const excerptPara = document.createElement('p');
+                  excerptPara.innerHTML = excerpt; 
+                  Object.assign(excerptPara.style, {
+                    fontSize: '0.9em',
+                    color: '#555',
+                    margin: '0 0 5px 0', 
+                    lineHeight: '1.4'
+                  });
+                  
+                  if (i > 0) { // Add a little visual separation for subsequent excerpts
+                    excerptPara.style.borderTop = '1px dashed #eee';
+                    excerptPara.style.paddingTop = '5px';
+                    excerptPara.style.marginTop = '8px';
+                  }
+                  excerptsWrapper.appendChild(excerptPara);
+
+                  if (matchInTagContext) {
+                    itemHasOverallTagMatch = true;
+                  }
+                });
+                listItem.appendChild(excerptsWrapper);
+              }
+              // else: No matches in body (term might have been in title only)
+
+              if (itemHasOverallTagMatch) {
+                listItem.style.backgroundColor = '#e9ecef'; 
               }
             }
             list.appendChild(listItem);
@@ -599,7 +635,6 @@ async function SearchInCourse(){
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
     }
 
-    // Helper function to check if a specific index in an HTML string is effectively inside a tag's definition
     function isIndexEffectivelyInTag(htmlString, targetIndex) {
         if (!htmlString || targetIndex < 0 || targetIndex >= htmlString.length) return false;
         
@@ -629,26 +664,21 @@ async function SearchInCourse(){
     }
 
 
-    function createExcerpt(rawHtmlBody, term, maxLength) {
-        if (!rawHtmlBody || !term) return { excerpt: '', matchInTagContext: false };
-
-        const lowerBody = rawHtmlBody.toLowerCase();
-        const lowerTerm = term.toLowerCase();
-        const matchIndex = lowerBody.indexOf(lowerTerm);
-
-        if (matchIndex === -1) {
-            // This case should ideally not be hit if called for items already confirmed to match.
-            // Provides a fallback just in case.
-            let fallbackExcerpt = rawHtmlBody.substring(0, maxLength);
-            if (rawHtmlBody.length > maxLength) fallbackExcerpt += '...';
-            // Escape, as context is unknown, safer to treat as potential HTML that needs escaping.
+    // Modified createExcerpt to accept a specific matchIndex
+    function createExcerpt(rawHtmlBody, term, maxLength, matchIndex) {
+        // rawHtmlBody and term are original case, matchIndex is the specific start of the term
+        if (!rawHtmlBody || !term || matchIndex === -1) {
+             // Fallback if somehow called with no valid matchIndex, though getAllMatchIndices should prevent -1
+            let fallbackExcerpt = rawHtmlBody ? rawHtmlBody.substring(0, maxLength) : '';
+            if (rawHtmlBody && rawHtmlBody.length > maxLength) fallbackExcerpt += '...';
             return { excerpt: escapeHTML(fallbackExcerpt), matchInTagContext: false };
         }
 
         // Get the actual matched term from the original rawHtmlBody to preserve casing
+        // term.length is used as lowerTerm.length might differ if term has mixed case
         const actualMatchedTerm = rawHtmlBody.substring(matchIndex, matchIndex + term.length);
         
-        // Determine if the start of the match is within an HTML tag's definition
+        // Determine if the start of this specific match is within an HTML tag's definition
         const matchIsInsideTagDefinition = isIndexEffectivelyInTag(rawHtmlBody, matchIndex);
 
         const contextChars = Math.floor((maxLength - actualMatchedTerm.length) / 2);
@@ -661,8 +691,9 @@ async function SearchInCourse(){
         if (matchIsInsideTagDefinition) {
             // Match is in HTML tag: display as HTML code, highlight term
             // Highlight the actual matched term (preserving its original case)
+            // We need to be careful with replacing if actualMatchedTerm contains regex special chars
             let highlightedExcerpt = currentExcerptSegment.replace(
-                new RegExp(escapeRegExp(actualMatchedTerm), 'gi'), 
+                new RegExp(escapeRegExp(actualMatchedTerm), 'g'), // Use 'g' in case the term repeats within the segment
                 (match) => `<mark>${match}</mark>`
             );
             // Escape the HTML in the excerpt for safe display, then re-insert <mark> tags
