@@ -236,13 +236,36 @@ async function SearchInCourse(){
         console.warn('adminToolsCourseContent not loaded yet – call await buildCourseContent(courseID) first')
         return {}
       }
-      const lower = term.toLowerCase()
+      
+      const lowerTerm = term.toLowerCase();
+      let searchRegex = null;
+
+      if (term.includes('*')) {
+        // Escape regex special characters in parts, then replace '*' with '.{0,10}'
+        // This ensures other special characters in 'term' are treated literally.
+        const pattern = lowerTerm
+          .split('*')
+          .map(part => escapeRegExp(part)) // escapeRegExp is already defined in your script
+          .join('.{0,10}'); // '*' matches any text up to 10 chars
+        try {
+          searchRegex = new RegExp(pattern);
+        } catch (e) {
+          console.error("Error creating RegExp for wildcard search:", e);
+          // Fallback to literal search if regex is invalid, though unlikely with current setup
+          // Or, simply return no results for an invalid pattern.
+          // For now, we'll let it proceed to the 'else' block if searchRegex remains null.
+        }
+      }
+
       const results = {}
       for (const [section, items] of Object.entries(window.adminToolsCourseContent)) {
         results[section] = items.filter(item => {
-            // Always search in HTML content (title and body)
-            const hay = `${item.title||''} ${item.body||''}`.toLowerCase()
-            return hay.includes(lower)
+            const hay = `${item.title||''} ${item.body||''}`.toLowerCase();
+            if (searchRegex) {
+              return searchRegex.test(hay);
+            } else {
+              return hay.includes(lowerTerm);
+            }
         })
       }
       return results
@@ -470,20 +493,41 @@ async function SearchInCourse(){
             .replace(/'/g, '&#039;');
     }
 
-    // NEW Helper function to find all occurrences of a substring
-    function getAllMatchIndices(text, searchTerm) {
-        const indices = [];
-        if (!text || !searchTerm) return indices;
-        const lowerText = text.toLowerCase();
-        const lowerSearchTerm = searchTerm.toLowerCase();
-        let startIndex = 0;
-        let index = lowerText.indexOf(lowerSearchTerm, startIndex);
-        while (index > -1) {
-            indices.push(index);
-            startIndex = index + lowerSearchTerm.length;
-            index = lowerText.indexOf(lowerSearchTerm, startIndex);
+    // REPLACE the existing getAllMatchIndices function (lines 468-481) with this new function:
+    function getAllMatchDetails(text, searchTerm) {
+        const matches = [];
+        if (!text || !searchTerm) return matches;
+
+        if (searchTerm.includes('*')) {
+            const pattern = searchTerm
+                .toLowerCase() // Prepare pattern for case-insensitive regex
+                .split('*')
+                .map(part => escapeRegExp(part)) // escapeRegExp is already defined
+                .join('.{0,10}'); // '*' matches any text up to 10 chars
+            try {
+                const regex = new RegExp(pattern, 'gi'); // 'g' for global, 'i' for case-insensitive
+                let matchResult;
+                // Execute regex on the original-case text
+                while ((matchResult = regex.exec(text)) !== null) {
+                    matches.push({ index: matchResult.index, text: matchResult[0] });
+                }
+            } catch (e) {
+                console.error("Error creating/using RegExp in getAllMatchDetails:", e);
+                // If regex fails, return no matches for this wildcard term
+            }
+        } else {
+            // Literal search (case-insensitive)
+            const lowerText = text.toLowerCase();
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            let startIndex = 0;
+            let index;
+            while ((index = lowerText.indexOf(lowerSearchTerm, startIndex)) > -1) {
+                // Extract the original-cased text segment that matched
+                matches.push({ index: index, text: text.substring(index, index + lowerSearchTerm.length) });
+                startIndex = index + lowerSearchTerm.length;
+            }
         }
-        return indices;
+        return matches;
     }
 
     function displayResults(results, searchTerm, container, courseID) {
@@ -565,19 +609,24 @@ async function SearchInCourse(){
 
             // Excerpt modification for multiple occurrences
             if (item.body && item.body.trim() !== '') {
-              const matchIndices = getAllMatchIndices(item.body, searchTerm);
+              // const matchIndices = getAllMatchIndices(item.body, searchTerm); // OLD LINE
+              const matchDetails = getAllMatchDetails(item.body, searchTerm); // NEW: Use new function
               let itemHasOverallTagMatch = false;
 
-              if (matchIndices.length > 0) {
+              // if (matchIndices.length > 0) { // OLD LINE
+              if (matchDetails.length > 0) { // NEW: Check new details
                 const excerptsWrapper = document.createElement('div');
                 Object.assign(excerptsWrapper.style, {
                     marginLeft: '15px', // Indent excerpts container
                     marginTop: '5px'
                 });
 
-                matchIndices.forEach((matchIdx, i) => {
+                // matchIndices.forEach((matchIdx, i) => { // OLD LINE
+                matchDetails.forEach((detail, i) => { // NEW: Iterate over new details
                   // Pass item.body (original case) and the specific matchIndex
-                  const { excerpt, matchInTagContext } = createExcerpt(item.body, searchTerm, 120, matchIdx);
+                  // const { excerpt, matchInTagContext } = createExcerpt(item.body, searchTerm, 120, matchIdx); // OLD LINE
+                  // NEW: Pass actual matched text (detail.text) and its index (detail.index) to createExcerpt
+                  const { excerpt, matchInTagContext } = createExcerpt(item.body, detail.text, 120, detail.index);
                   
                   const excerptPara = document.createElement('p');
                   excerptPara.innerHTML = excerpt; 
@@ -665,18 +714,21 @@ async function SearchInCourse(){
 
 
     // Modified createExcerpt to accept a specific matchIndex
-    function createExcerpt(rawHtmlBody, term, maxLength, matchIndex) {
-        // rawHtmlBody and term are original case, matchIndex is the specific start of the term
-        if (!rawHtmlBody || !term || matchIndex === -1) {
-             // Fallback if somehow called with no valid matchIndex, though getAllMatchIndices should prevent -1
+    // The second parameter `term` will now be the actual matched text segment.
+    function createExcerpt(rawHtmlBody, textToHighlight, maxLength, matchIndex) { // Changed `term` to `textToHighlight`
+        // rawHtmlBody is original case.
+        // textToHighlight is the actual segment from rawHtmlBody that matched (e.g., "caterpillar" if searchTerm was "cat*").
+        // matchIndex is the starting index of textToHighlight within rawHtmlBody.
+
+        if (!rawHtmlBody || !textToHighlight || matchIndex === -1) {
+             // Fallback if somehow called with no valid matchIndex
             let fallbackExcerpt = rawHtmlBody ? rawHtmlBody.substring(0, maxLength) : '';
             if (rawHtmlBody && rawHtmlBody.length > maxLength) fallbackExcerpt += '...';
             return { excerpt: escapeHTML(fallbackExcerpt), matchInTagContext: false };
         }
 
-        // Get the actual matched term from the original rawHtmlBody to preserve casing
-        // term.length is used as lowerTerm.length might differ if term has mixed case
-        const actualMatchedTerm = rawHtmlBody.substring(matchIndex, matchIndex + term.length);
+        // `textToHighlight` is the actual segment that we want to work with and highlight.
+        const actualMatchedTerm = textToHighlight; 
         
         // Determine if the start of this specific match is within an HTML tag's definition
         const matchIsInsideTagDefinition = isIndexEffectivelyInTag(rawHtmlBody, matchIndex);
@@ -690,10 +742,9 @@ async function SearchInCourse(){
 
         if (matchIsInsideTagDefinition) {
             // Match is in HTML tag: display as HTML code, highlight term
-            // Highlight the actual matched term (preserving its original case)
-            // We need to be careful with replacing if actualMatchedTerm contains regex special chars
+            // Highlight the actualMatchedTerm (preserving its original case)
             let highlightedExcerpt = currentExcerptSegment.replace(
-                new RegExp(escapeRegExp(actualMatchedTerm), 'g'), // Use 'g' in case the term repeats within the segment
+                new RegExp(escapeRegExp(actualMatchedTerm), 'g'), // Use 'g' for all occurrences in segment
                 (match) => `<mark>${match}</mark>`
             );
             // Escape the HTML in the excerpt for safe display, then re-insert <mark> tags
@@ -703,9 +754,12 @@ async function SearchInCourse(){
             // Match is in text content: display as stripped text, highlight term
             // Strip HTML from the current segment to get the text content
             const textOnlySegment = stripHTML(currentExcerptSegment);
-            // Highlight the original search term (case-insensitive) on the stripped text
+            // Highlight the actualMatchedTerm (which has its original casing)
+            // The 'gi' flag ensures that if stripping HTML somehow changed casing (unlikely for the match itself), it's still found.
+            // However, since actualMatchedTerm is from the original text, 'g' should be sufficient if textOnlySegment preserves relative casing.
+            // Sticking to 'gi' as per original user code's else block for safety/consistency.
             finalDisplayExcerpt = textOnlySegment.replace(
-                new RegExp(escapeRegExp(term), 'gi'), 
+                new RegExp(escapeRegExp(actualMatchedTerm), 'gi'), 
                 (match) => `<mark>${match}</mark>`
             );
         }
