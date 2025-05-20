@@ -58,104 +58,103 @@ async function SearchInCourse(){
     }
   
     // Endpoints with limits to avoid rate issues
-    async function getPages(courseID, queryStatus) {
-      if (queryStatus) queryStatus.textContent = 'Loading pages...'
-      const pages = await fetchJSON(`/api/v1/courses/${courseID}/pages?per_page=100`)
+    async function getPages(courseID, reportItemAttempted, updateTotalItems) {
+      // if (queryStatus) queryStatus.textContent = 'Loading pages...' // Remove this
+      const pages = await fetchJSON(`/api/v1/courses/${courseID}/pages?per_page=100`);
+      if (updateTotalItems) updateTotalItems(pages.length);
       
-      // Remove the slice limit
       const pagesToFetch = pages;
-      if (queryStatus) queryStatus.textContent = `Loading page details (0/${pagesToFetch.length})...`
+      // if (queryStatus) queryStatus.textContent = `Loading page details (0/${pagesToFetch.length})...` // Remove this
       
-      // Fetch pages sequentially to avoid rate limits
-      const foundPages = []
+      const foundPages = [];
       for (let i = 0; i < pagesToFetch.length; i++) {
         try {
-          const page = await fetchJSON(`/api/v1/courses/${courseID}/pages/${pagesToFetch[i].url}`)
-          foundPages.push(page)
-          if (queryStatus) queryStatus.textContent = `Loading page details (${i+1}/${pagesToFetch.length})...`
-          
-          // Add a small delay between requests
-          if (i < pagesToFetch.length - 1) await delay(0)
+          const page = await fetchJSON(`/api/v1/courses/${courseID}/pages/${pagesToFetch[i].url}`);
+          foundPages.push(page);
+          // if (queryStatus) queryStatus.textContent = `Loading page details (${i+1}/${pagesToFetch.length})...` // Remove this
         } catch (err) {
-          console.error(`Error loading page ${pagesToFetch[i].url}:`, err)
-          // Continue with other pages even if one fails
+          console.error(`Error loading page ${pagesToFetch[i].url}:`, err);
+          // Still an attempt
+        } finally {
+            if (reportItemAttempted) reportItemAttempted();
         }
+        if (i < pagesToFetch.length - 1) await delay(0);
       }
       
-      if (queryStatus) queryStatus.textContent = `Pages: Complete (${foundPages.length}/${pages.length})`;
-      console.log(`Loaded ${foundPages.length}/${pages.length} pages`)
-      return foundPages
+      // if (queryStatus) queryStatus.textContent = `Pages: Complete (${foundPages.length}/${pages.length})`; // Remove this
+      console.log(`Loaded ${foundPages.length}/${pages.length} pages`);
+      return foundPages;
     }
   
     // Update getAssignments to show detailed progress
-    async function getAssignments(courseID, progressElement) {
-      if (progressElement) progressElement.textContent = 'Assignments: Loading list...';
+    async function getAssignments(courseID, reportItemAttempted, updateTotalItems) {
+      // if (progressElement) progressElement.textContent = 'Assignments: Loading list...'; // Remove
       const assignments = await fetchJSON(`/api/v1/courses/${courseID}/assignments?per_page=100`);
+      if (updateTotalItems) updateTotalItems(assignments.length);
       
-      // Even though there's no detailed fetching like with pages,
-      // we'll show a "processing" step for consistency
-      if (progressElement) progressElement.textContent = `Assignments: Processing (0/${assignments.length})...`;
+      // if (progressElement) progressElement.textContent = `Assignments: Processing (0/${assignments.length})...`; // Remove
       
-      // Process assignments in batches to show progress
       const result = [];
       const batchSize = 10;
       
-      for (let i = 0; i < assignments.length; i += batchSize) {
-        const batch = assignments.slice(i, i + batchSize);
-        result.push(...batch.map(a => ({ id: a.id, title: a.name, body: a.description })));
+      for (let i = 0; i < assignments.length; i++) { // Iterate for individual reporting
+        const assignment = assignments[i];
+        result.push({ id: assignment.id, title: assignment.name, body: assignment.description });
+        if (reportItemAttempted) reportItemAttempted();
         
-        if (progressElement) {
-          const processed = Math.min(i + batchSize, assignments.length);
-          progressElement.textContent = `Assignments: Processing (${processed}/${assignments.length})...`;
+        // if (progressElement) { // Remove block
+        //   const processed = Math.min(i + batchSize, assignments.length);
+        //   progressElement.textContent = `Assignments: Processing (${processed}/${assignments.length})...`;
+        // }
+        
+        if ((i + 1) % batchSize === 0 && i < assignments.length - 1) {
+            await delay(10);
         }
-        
-        // Small delay to allow UI update and prevent freezing on large courses
-        if (i + batchSize < assignments.length) await delay(10);
       }
       
-      if (progressElement) progressElement.textContent = `Assignments: Complete (${assignments.length})`;
+      // if (progressElement) progressElement.textContent = `Assignments: Complete (${assignments.length})`; // Remove
       return result;
     }
   
     // Update getQuizzes to show detailed progress
-    async function getQuizzes(courseID, progressElement) {
-      if (progressElement) progressElement.textContent = 'Quizzes: Loading list...';
+    async function getQuizzes(courseID, reportItemAttempted, updateTotalItems) {
+      // if (progressElement) progressElement.textContent = 'Quizzes: Loading list...'; // Remove
       const quizzes = await fetchJSON(`/api/v1/courses/${courseID}/quizzes?per_page=100`);
+      if (updateTotalItems) updateTotalItems(quizzes.length);
       
-      // Show processing progress for consistency
-      if (progressElement) progressElement.textContent = `Quizzes: Processing (0/${quizzes.length})...`;
+      // if (progressElement) progressElement.textContent = `Quizzes: Processing (0/${quizzes.length})...`; // Remove
       
-      // Process quizzes in batches to show progress
       const result = [];
       const batchSize = 10;
       
-      for (let i = 0; i < quizzes.length; i += batchSize) {
-        const batch = quizzes.slice(i, i + batchSize);
-        result.push(...batch.map(q => ({ id: q.id, title: q.title, body: q.description })));
+      for (let i = 0; i < quizzes.length; i++) { // Iterate for individual reporting
+        const quiz = quizzes[i];
+        result.push({ id: quiz.id, title: quiz.title, body: quiz.description });
+        if (reportItemAttempted) reportItemAttempted();
+
+        // if (progressElement) { // Remove block
+        //   const processed = Math.min(i + batchSize, quizzes.length);
+        //   progressElement.textContent = `Quizzes: Processing (${processed}/${quizzes.length})...`;
+        // }
         
-        if (progressElement) {
-          const processed = Math.min(i + batchSize, quizzes.length);
-          progressElement.textContent = `Quizzes: Processing (${processed}/${quizzes.length})...`;
+        if ((i + 1) % batchSize === 0 && i < quizzes.length - 1) {
+            await delay(10);
         }
-        
-        // Small delay to allow UI update and prevent freezing on large courses
-        if (i + batchSize < quizzes.length) await delay(10);
       }
       
-      if (progressElement) progressElement.textContent = `Quizzes: Complete (${quizzes.length})`;
+      // if (progressElement) progressElement.textContent = `Quizzes: Complete (${quizzes.length})`; // Remove
       return result;
     }
   
     // Update getDiscussions for consistent naming pattern
-    async function getDiscussions(courseID, progressElement) {
-      if (progressElement) progressElement.textContent = 'Discussions: Loading list...';
+    async function getDiscussions(courseID, reportItemAttempted, updateTotalItems) {
+      // if (progressElement) progressElement.textContent = 'Discussions: Loading list...'; // Remove
       const topics = await fetchJSON(`/api/v1/courses/${courseID}/discussion_topics?per_page=100`);
+      if (updateTotalItems) updateTotalItems(topics.length);
       
-      // Remove the slice limit
       const topicsToFetch = topics;
-      if (progressElement) progressElement.textContent = `Discussions: Loading details (0/${topicsToFetch.length})...`;
+      // if (progressElement) progressElement.textContent = `Discussions: Loading details (0/${topicsToFetch.length})...` // Remove
       
-      // Fetch discussion entries sequentially
       const results = [];
       for (let i = 0; i < topicsToFetch.length; i++) {
         try {
@@ -168,19 +167,19 @@ async function SearchInCourse(){
             body: topicsToFetch[i].message, 
             entries 
           });
-          if (progressElement) progressElement.textContent = `Discussions: Loading details (${i+1}/${topicsToFetch.length})...`;
-          
-          // Add a small delay between requests
-          if (i < topicsToFetch.length - 1) await delay(100);
+          // if (progressElement) progressElement.textContent = `Discussions: Loading details (${i+1}/${topicsToFetch.length})...` // Remove
         } catch (err) {
           console.error(`Error loading discussion ${topicsToFetch[i].id}:`, err);
-          // Continue with other discussions even if one fails
+          // Still an attempt
+        } finally {
+            if (reportItemAttempted) reportItemAttempted();
         }
+        if (i < topicsToFetch.length - 1) await delay(100);
       }
       
-      if (progressElement) progressElement.textContent = `Discussions: Complete (${results.length}/${topics.length})`;
+      // if (progressElement) progressElement.textContent = `Discussions: Complete (${results.length}/${topics.length})`; // Remove
       console.log(`Loaded ${results.length}/${topics.length} discussions`);
-      return results
+      return results;
     }
   
     // Extract courseID from URL
@@ -191,42 +190,61 @@ async function SearchInCourse(){
   
     // Build global index - now sequential to avoid rate limits
     async function buildCourseContent(courseID, queryStatus) {
-      try {
-        if (queryStatus) {
-          // Create a structured progress display for all content types
-          queryStatus.innerHTML = `
-            <div style="text-align: left; font-size: 0.9em; color: #555; margin-bottom: 8px;">
-              <div id="pages-progress">Pages: Waiting to start...</div>
-              <div id="assignments-progress">Assignments: Waiting to start...</div>
-              <div id="quizzes-progress">Quizzes: Waiting to start...</div>
-              <div id="discussions-progress">Discussions: Waiting to start...</div>
-            </div>
-          `;
+      queryStatus.textContent = 'Loading 0%...'; // Initial state
+      let totalItemsToProcess = 0;
+      let itemsAttempted = 0;
+
+      function updateTotalItems(count) {
+        totalItemsToProcess += count;
+        updateOverallProgress();
+      }
+
+      function reportItemAttempted() {
+        itemsAttempted++;
+        updateOverallProgress();
+      }
+
+      function updateOverallProgress() {
+        if (totalItemsToProcess > 0) {
+          const percentage = Math.min(100, Math.round((itemsAttempted / totalItemsToProcess) * 100));
+          queryStatus.textContent = `Loading ${percentage}%...`;
+        } else {
+          // This state occurs before any updateTotalItems calls complete
+          queryStatus.textContent = `Loading 0%...`; 
         }
+      }
+
+      try {
+        // REMOVE: The old queryStatus.innerHTML that created individual divs
+        // if (queryStatus) {
+        //   queryStatus.innerHTML = `
+        //     <div style="text-align: left; font-size: 0.9em; color: #555; margin-bottom: 8px;">
+        //       <div id="pages-progress">Pages: Waiting to start...</div>
+        //       ...
+        //     </div>
+        //   `;
+        // }
         
-        // Get references to progress elements
-        const pagesProgress = document.getElementById('pages-progress');
-        const assignmentsProgress = document.getElementById('assignments-progress');
-        const quizzesProgress = document.getElementById('quizzes-progress');
-        const discussionsProgress = document.getElementById('discussions-progress');
+        // REMOVE: The getElementById calls for individual progress elements
+        // const pagesProgress = document.getElementById('pages-progress');
+        // ...
         
-        // Start all content type requests in parallel
         const [pages, assignments, quizzes, discussions] = await Promise.all([
-          getPages(courseID, pagesProgress),
-          getAssignments(courseID, assignmentsProgress),
-          getQuizzes(courseID, quizzesProgress),
-          getDiscussions(courseID, discussionsProgress)
+          getPages(courseID, reportItemAttempted, updateTotalItems),
+          getAssignments(courseID, reportItemAttempted, updateTotalItems),
+          getQuizzes(courseID, reportItemAttempted, updateTotalItems),
+          getDiscussions(courseID, reportItemAttempted, updateTotalItems)
         ]);
         
-        window.adminToolsCourseContent = { pages, assignments, quizzes, discussions }
-        console.log('courseContent ready', window.adminToolsCourseContent)
+        window.adminToolsCourseContent = { pages, assignments, quizzes, discussions };
+        console.log('courseContent ready', window.adminToolsCourseContent);
         
-        if (queryStatus) queryStatus.textContent = 'Ready to search'
-        return window.adminToolsCourseContent
+        if (queryStatus) queryStatus.textContent = 'Ready to search'; // Final success state
+        return window.adminToolsCourseContent;
       } catch (err) {
-        console.error('Error building course content:', err)
-        if (queryStatus) queryStatus.textContent = 'Error loading content. Try again later.'
-        throw err
+        console.error('Error building course content:', err);
+        if (queryStatus) queryStatus.textContent = 'Error loading content. Try again later.';
+        throw err;
       }
     }
   
