@@ -29,6 +29,12 @@ const clickableScripts = [
     name: "Copy All Broken Links", 
     description: "Displays a window with all broken links in the course and allows you to copy them to the clipboard.",
     file: "content/clickables/CopyBrokenLinks/copyBrokenLinks.js"
+  },
+  {
+    id: "searchInCourse", 
+    name: "Search in Course", 
+    description: "Searches for text in the course and displays a window with all the results.",
+    file: "content/clickables/SearchInCourse/searchInCourse.js"
   }
   // Add more clickable scripts as needed
 ];
@@ -105,36 +111,6 @@ const utilScripts = [
 ]
 
 
-/*---------------------------
-  Register Utility Functions
- ---------------------------*/
-//  function registerUtilScripts() {
-//   utilScripts.forEach(scriptDef => {
-//     // Unregister any previously registered script with this ID to prevent duplicates.
-//     chrome.scripting.unregisterContentScripts({ ids: [scriptDef.id] })
-//       .catch(err => {
-//         // It's safe to ignore errors if the script wasn't registered.
-//         console.warn(`[background] Unregister warning for ${scriptDef.id}:`, err);
-//       })
-//       .finally(() => {
-//         // If the script is enabled, register it.
-        
-//         chrome.scripting.registerContentScripts([{
-//           id: scriptDef.id,
-//           js: [scriptDef.file],
-//           matches: scriptDef.matches,
-//           runAt: scriptDef.runAt,
-//           persistAcrossSessions: true
-//         }]).then(() => {
-//           console.log(`[background] Registered util script: ${scriptDef.id}`);
-//         }).catch(err => {
-//           console.error(`[background] Failed to register ${scriptDef.id}:`, err);
-//         });
-        
-//       });
-//   });
-//  }
- 
 
 
 /* --------------------------
