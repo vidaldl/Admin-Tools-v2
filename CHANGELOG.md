@@ -1,6 +1,9 @@
 # Changelog
 
-# Changelog
+## [2.3.0] - 2025-05-22
+### Added
+- Added "Search In Course" functionality that opens a window to search through all the content in the course.
+
 ## [2.2.0] - 2025-04-07
 ### Added
 - Added "Sort Navigation" functionality that sorts all of the disabled navigation items in a course when clicked.

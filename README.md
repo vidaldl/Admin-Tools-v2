@@ -12,6 +12,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Lock Blueprint Items](#lock-blueprint-items)
     - [Unlock Blueprint Items](#unlock-blueprint-items)
     - [Copy Broken Links](#copy-broken-links)
+    = [Search In Course](#search-in-course)
   - [Displays](#displays)
     - [Sections Column](#sections-column)
     - [Sections in Breadcrumbs](#sections-in-breadcrumbs)
@@ -77,6 +78,19 @@ Displays a window with all broken links in the course and allows you to copy the
 2. Open the extension popup.  
 3. Click the **Copy All Broken Links** button.
 4. Copy individual columns or all of them by clickinng on **Copy All**. They are formatted to be pasted in a spreadsheet as columns and rows.
+
+#### Search In Course
+<img alt="Seach In Course Button" src="content/clickables/SearchInCourse/SearchInCourse.png" width="300">
+
+<img alt="Search In Course Window" src="content/clickables/SearchInCourse/SearchInCourse-2.png" width="400">
+
+Displays a window with a search bar that allows the search of any text in the content of the course.
+
+**Usage:**
+1. Navigate to the hom epage of any course 
+2. Open the extension popup.  
+3. Click the **Search in Course** button.
+4. After loading is complete, search any text in the course content.
 
 ### Displays
 
