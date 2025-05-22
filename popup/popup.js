@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(`Injected ${script.name} into tab ${tab.id}`);
               });
             }
+            window.close(); // Close the popup
           });
           container.appendChild(btn);
         });
@@ -31,6 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.tabs.create({
             url: chrome.runtime.getURL("options/options.html")
           });
+        window.close(); // Close the popup
       });
   });
-  
