@@ -12,7 +12,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Lock Blueprint Items](#lock-blueprint-items)
     - [Unlock Blueprint Items](#unlock-blueprint-items)
     - [Copy Broken Links](#copy-broken-links)
-    = [Search In Course](#search-in-course)
+    - [Search In Course](#search-in-course)
   - [Displays](#displays)
     - [Sections Column](#sections-column)
     - [Sections in Breadcrumbs](#sections-in-breadcrumbs)
