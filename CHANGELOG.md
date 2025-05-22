@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.1] - 2025-05-22
+### Added
+- Patch: fixed behavior for popup to close when a clickable function button is clicked.
+
 ## [2.3.0] - 2025-05-22
 ### Added
 - Added "Search In Course" functionality that opens a window to search through all the content in the course.
