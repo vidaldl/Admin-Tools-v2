@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.2] - 2025-05-23
+### Added
+- Patch: fixed performance loading for Search in Course.
+
 ## [2.3.1] - 2025-05-22
 ### Added
 - Patch: fixed behavior for popup to close when a clickable function button is clicked.
