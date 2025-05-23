@@ -327,6 +327,10 @@ async function SearchInCourse(){
       buildCourseContent(cid, queryStatus)
         .then(() => {
           queryStatus.textContent = 'Query too short.'
+          // Enable the search bar once content has loaded
+          modal.searchInput.disabled = false;
+          // Optionally, focus the input now that it's enabled:
+          modal.searchInput.focus();
         })
         .catch(err => {
           queryStatus.textContent = 'Error loading content. Try again later.'
@@ -437,19 +441,19 @@ async function SearchInCourse(){
       const searchInput = document.createElement('input');
       searchInput.type = 'text';
       searchInput.placeholder = 'Search 1 course for:';
+      // Disable the search bar initially while content loads
+      searchInput.disabled = true;
       Object.assign(searchInput.style, {
         width: 'calc(100% - 22px)', // Account for padding and border
         padding: '10px',
         fontSize: '1em',
         border: '1px solid #ccc',
         borderRadius: '4px',
-        marginBottom: '10px' // Keep margin for spacing
+        marginBottom: '10px'
       });
-
-      // REMOVE Checkbox container, checkbox, and label elements
-      // const checkboxContainer = document.createElement('div'); ...
-      // const htmlCheckbox = document.createElement('input'); ...
-      // const htmlCheckboxLabel = document.createElement('label'); ...
+      
+      // Save reference to enable later after content load
+      modal.searchInput = searchInput;
       
       const queryStatus = document.createElement('p');
       queryStatus.textContent = 'Loading...';
@@ -475,7 +479,6 @@ async function SearchInCourse(){
       content.appendChild(promptText);
       content.appendChild(subText);
       content.appendChild(searchInput);
-      // REMOVE: content.appendChild(checkboxContainer); 
       content.appendChild(queryStatus);
       content.appendChild(resultsContainer); // Add results container
 
@@ -521,8 +524,6 @@ async function SearchInCourse(){
             // If query is too short, message is already set
         }, 300); // Debounce search input
       });
-      
-      // REMOVE: htmlCheckbox.addEventListener('change', ...);
       
       return modal; // Return modal for access to queryStatus
     }
