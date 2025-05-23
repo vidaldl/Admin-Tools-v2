@@ -59,30 +59,49 @@ async function SearchInCourse(){
   
     // Endpoints with limits to avoid rate issues
     async function getPages(courseID, reportItemAttempted, updateTotalItems) {
-      // if (queryStatus) queryStatus.textContent = 'Loading pages...' // Remove this
-      const pages = await fetchJSON(`/api/v1/courses/${courseID}/pages?per_page=100`);
-      if (updateTotalItems) updateTotalItems(pages.length);
-      
-      const pagesToFetch = pages;
-      // if (queryStatus) queryStatus.textContent = `Loading page details (0/${pagesToFetch.length})...` // Remove this
-      
       const foundPages = [];
-      for (let i = 0; i < pagesToFetch.length; i++) {
-        try {
-          const page = await fetchJSON(`/api/v1/courses/${courseID}/pages/${pagesToFetch[i].url}`);
-          foundPages.push(page);
-          // if (queryStatus) queryStatus.textContent = `Loading page details (${i+1}/${pagesToFetch.length})...` // Remove this
-        } catch (err) {
-          console.error(`Error loading page ${pagesToFetch[i].url}:`, err);
-          // Still an attempt
-        } finally {
-            if (reportItemAttempted) reportItemAttempted();
-        }
-        if (i < pagesToFetch.length - 1) await delay(0);
+      let url = `/api/v1/courses/${courseID}/pages?include[]=body&per_page=100`;
+      
+      // First request to get initial pages and determine total count
+      let response = await fetchJSON(url);
+      foundPages.push(...response);
+      
+      // Update total items with initial batch
+      if (updateTotalItems) updateTotalItems(response.length);
+      
+      // Report progress for initial batch
+      if (reportItemAttempted) {
+        response.forEach(() => reportItemAttempted());
       }
       
-      // if (queryStatus) queryStatus.textContent = `Pages: Complete (${foundPages.length}/${pages.length})`; // Remove this
-      console.log(`Loaded ${foundPages.length}/${pages.length} pages`);
+      // Handle pagination - Canvas uses Link headers for pagination
+      while (response.length === 100) { // If we got a full page, there might be more
+        try {
+          // Get next page
+          const nextUrl = `/api/v1/courses/${courseID}/pages?include[]=body&per_page=100&page=${Math.floor(foundPages.length / 100) + 2}`;
+          response = await fetchJSON(nextUrl);
+          
+          if (response.length > 0) {
+            foundPages.push(...response);
+            
+            // Update total items with new batch
+            if (updateTotalItems) updateTotalItems(response.length);
+            
+            // Report progress for this batch
+            if (reportItemAttempted) {
+              response.forEach(() => reportItemAttempted());
+            }
+            
+            // Small delay between pagination requests
+            await delay(50);
+          }
+        } catch (err) {
+          console.error(`Error loading additional pages:`, err);
+          break; // Stop pagination on error
+        }
+      }
+      
+      console.log(`Loaded ${foundPages.length} pages with bodies included`);
       return foundPages;
     }
   
@@ -101,28 +120,22 @@ async function SearchInCourse(){
         const assignment = assignments[i];
         result.push({ id: assignment.id, title: assignment.name, body: assignment.description });
         if (reportItemAttempted) reportItemAttempted();
-        
-        // if (progressElement) { // Remove block
-        //   const processed = Math.min(i + batchSize, assignments.length);
-        //   progressElement.textContent = `Assignments: Processing (${processed}/${assignments.length})...`;
-        // }
+
         
         if ((i + 1) % batchSize === 0 && i < assignments.length - 1) {
             await delay(10);
         }
       }
       
-      // if (progressElement) progressElement.textContent = `Assignments: Complete (${assignments.length})`; // Remove
+
       return result;
     }
   
     // Update getQuizzes to show detailed progress
     async function getQuizzes(courseID, reportItemAttempted, updateTotalItems) {
-      // if (progressElement) progressElement.textContent = 'Quizzes: Loading list...'; // Remove
       const quizzes = await fetchJSON(`/api/v1/courses/${courseID}/quizzes?per_page=100`);
       if (updateTotalItems) updateTotalItems(quizzes.length);
       
-      // if (progressElement) progressElement.textContent = `Quizzes: Processing (0/${quizzes.length})...`; // Remove
       
       const result = [];
       const batchSize = 10;
@@ -132,53 +145,66 @@ async function SearchInCourse(){
         result.push({ id: quiz.id, title: quiz.title, body: quiz.description });
         if (reportItemAttempted) reportItemAttempted();
 
-        // if (progressElement) { // Remove block
-        //   const processed = Math.min(i + batchSize, quizzes.length);
-        //   progressElement.textContent = `Quizzes: Processing (${processed}/${quizzes.length})...`;
-        // }
-        
         if ((i + 1) % batchSize === 0 && i < quizzes.length - 1) {
             await delay(10);
         }
       }
       
-      // if (progressElement) progressElement.textContent = `Quizzes: Complete (${quizzes.length})`; // Remove
       return result;
     }
   
     // Update getDiscussions for consistent naming pattern
     async function getDiscussions(courseID, reportItemAttempted, updateTotalItems) {
-      // if (progressElement) progressElement.textContent = 'Discussions: Loading list...'; // Remove
-      const topics = await fetchJSON(`/api/v1/courses/${courseID}/discussion_topics?per_page=100`);
-      if (updateTotalItems) updateTotalItems(topics.length);
+      const foundDiscussions = [];
+      let url = `/api/v1/courses/${courseID}/discussion_topics?per_page=100`;
       
-      const topicsToFetch = topics;
-      // if (progressElement) progressElement.textContent = `Discussions: Loading details (0/${topicsToFetch.length})...` // Remove
+      // First request to get initial discussions
+      let response = await fetchJSON(url);
+      foundDiscussions.push(...response);
       
-      const results = [];
-      for (let i = 0; i < topicsToFetch.length; i++) {
-        try {
-          const entries = await fetchJSON(
-            `/api/v1/courses/${courseID}/discussion_topics/${topicsToFetch[i].id}/entries?per_page=30`
-          );
-          results.push({ 
-            id: topicsToFetch[i].id, 
-            title: topicsToFetch[i].title, 
-            body: topicsToFetch[i].message, 
-            entries 
-          });
-          // if (progressElement) progressElement.textContent = `Discussions: Loading details (${i+1}/${topicsToFetch.length})...` // Remove
-        } catch (err) {
-          console.error(`Error loading discussion ${topicsToFetch[i].id}:`, err);
-          // Still an attempt
-        } finally {
-            if (reportItemAttempted) reportItemAttempted();
-        }
-        if (i < topicsToFetch.length - 1) await delay(100);
+      // Update total items with initial batch
+      if (updateTotalItems) updateTotalItems(response.length);
+      
+      // Report progress for initial batch
+      if (reportItemAttempted) {
+        response.forEach(() => reportItemAttempted());
       }
       
-      // if (progressElement) progressElement.textContent = `Discussions: Complete (${results.length}/${topics.length})`; // Remove
-      console.log(`Loaded ${results.length}/${topics.length} discussions`);
+      // Handle pagination for courses with more than 100 discussions
+      while (response.length === 100) { // If we got a full page, there might be more
+        try {
+          // Get next page
+          const nextUrl = `/api/v1/courses/${courseID}/discussion_topics?per_page=100&page=${Math.floor(foundDiscussions.length / 100) + 2}`;
+          response = await fetchJSON(nextUrl);
+          
+          if (response.length > 0) {
+            foundDiscussions.push(...response);
+            
+            // Update total items with new batch
+            if (updateTotalItems) updateTotalItems(response.length);
+            
+            // Report progress for this batch
+            if (reportItemAttempted) {
+              response.forEach(() => reportItemAttempted());
+            }
+            
+            // Small delay between pagination requests
+            await delay(50);
+          }
+        } catch (err) {
+          console.error(`Error loading additional discussions:`, err);
+          break; // Stop pagination on error
+        }
+      }
+      
+      // Transform to consistent format for search
+      const results = foundDiscussions.map(topic => ({
+        id: topic.id,
+        title: topic.title,
+        body: topic.message || '' // Use message field as the body content
+      }));
+      
+      console.log(`Loaded ${results.length} discussions with bodies included`);
       return results;
     }
   
