@@ -170,7 +170,7 @@ async function ShiftDates() {
     }
 
     // Build the shift dates modal.
-    function buildShiftDatesModal(courseItems) {
+    function buildShiftDatesModal() {
         const modalOverlay = document.createElement('div')
         modalOverlay.id = 'shift-dates-modal-overlay'
         Object.assign(modalOverlay.style, {
@@ -249,14 +249,15 @@ async function ShiftDates() {
             padding: '20px 0 0 0'
         })
 
-        // Control section
+        // Control section (initially disabled)
         const controlSection = document.createElement('div')
         Object.assign(controlSection.style, {
             marginBottom: '20px',
             padding: '15px',
             backgroundColor: '#f8f9fa',
             borderRadius: '4px',
-            border: '1px solid #dee2e6'
+            border: '1px solid #dee2e6',
+            opacity: '0.5'
         })
 
         const controlLabel = document.createElement('label')
@@ -270,6 +271,7 @@ async function ShiftDates() {
         const daysInput = document.createElement('input')
         daysInput.type = 'number'
         daysInput.placeholder = 'Enter number of days (e.g., 7 or -3)'
+        daysInput.disabled = true
         Object.assign(daysInput.style, {
             width: '200px',
             padding: '8px',
@@ -281,6 +283,7 @@ async function ShiftDates() {
 
         const shiftButton = document.createElement('button')
         shiftButton.textContent = 'Shift Selected Dates'
+        shiftButton.disabled = true
         Object.assign(shiftButton.style, {
             padding: '8px 16px',
             fontSize: '1em',
@@ -288,7 +291,8 @@ async function ShiftDates() {
             color: 'white',
             border: 'none',
             borderRadius: '4px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            opacity: '0.6'
         })
 
         const statusDiv = document.createElement('div')
@@ -303,15 +307,88 @@ async function ShiftDates() {
         controlSection.appendChild(shiftButton)
         controlSection.appendChild(statusDiv)
 
-        // Table section
+        // Loading section
+        const loadingSection = document.createElement('div')
+        Object.assign(loadingSection.style, {
+            textAlign: 'center',
+            padding: '40px 20px',
+            color: '#666'
+        })
+
+        const loadingText = document.createElement('p')
+        loadingText.textContent = 'Loading course items...'
+        Object.assign(loadingText.style, {
+            fontSize: '1.1em',
+            marginBottom: '15px'
+        })
+
+        const progressText = document.createElement('p')
+        progressText.textContent = 'Loading 0%...'
+        progressText.classList.add('progress-status')
+        Object.assign(progressText.style, {
+            fontSize: '0.9em',
+            color: '#007bff',
+            margin: '5px 0'
+        })
+
+        const progressBar = document.createElement('div')
+        Object.assign(progressBar.style, {
+            width: '100%',
+            height: '8px',
+            backgroundColor: '#e9ecef',
+            borderRadius: '4px',
+            overflow: 'hidden',
+            marginTop: '10px'
+        })
+
+        const progressFill = document.createElement('div')
+        Object.assign(progressFill.style, {
+            width: '0%',
+            height: '100%',
+            backgroundColor: '#007bff',
+            transition: 'width 0.3s ease'
+        })
+
+        progressBar.appendChild(progressFill)
+        loadingSection.appendChild(loadingText)
+        loadingSection.appendChild(progressText)
+        loadingSection.appendChild(progressBar)
+
+        // Table container (initially hidden)
         const tableContainer = document.createElement('div')
         Object.assign(tableContainer.style, {
             maxHeight: '60vh',
             overflowY: 'auto',
             border: '1px solid #dee2e6',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            display: 'none'
         })
 
+        content.appendChild(controlSection)
+        content.appendChild(loadingSection)
+        content.appendChild(tableContainer)
+
+        modal.appendChild(header)
+        modal.appendChild(content)
+        modalOverlay.appendChild(modal)
+
+        document.body.appendChild(modalOverlay)
+
+        // Store references for later use
+        modal.controlSection = controlSection
+        modal.loadingSection = loadingSection
+        modal.tableContainer = tableContainer
+        modal.daysInput = daysInput
+        modal.shiftButton = shiftButton
+        modal.statusDiv = statusDiv
+        modal.progressText = progressText
+        modal.progressFill = progressFill
+
+        return modal
+    }
+
+    // Populate the table with loaded items
+    function populateTable(modal, courseItems) {
         const table = document.createElement('table')
         Object.assign(table.style, {
             width: '100%',
@@ -449,27 +526,27 @@ async function ShiftDates() {
         }
 
         table.appendChild(tbody)
-        tableContainer.appendChild(table)
+        modal.tableContainer.appendChild(table)
 
-        // Shift button click handler
-        shiftButton.onclick = async () => {
-            const days = parseInt(daysInput.value)
+        // Set up shift button click handler
+        modal.shiftButton.onclick = async () => {
+            const days = parseInt(modal.daysInput.value)
             if (isNaN(days)) {
-                statusDiv.textContent = 'Please enter a valid number of days.'
-                statusDiv.style.color = '#dc3545'
+                modal.statusDiv.textContent = 'Please enter a valid number of days.'
+                modal.statusDiv.style.color = '#dc3545'
                 return
             }
 
             const selectedItems = Array.from(tbody.querySelectorAll('input[type="checkbox"]:checked'))
             if (selectedItems.length === 0) {
-                statusDiv.textContent = 'Please select at least one item to shift.'
-                statusDiv.style.color = '#dc3545'
+                modal.statusDiv.textContent = 'Please select at least one item to shift.'
+                modal.statusDiv.style.color = '#dc3545'
                 return
             }
 
-            statusDiv.textContent = `Shifting ${selectedItems.length} items by ${days} days...`
-            statusDiv.style.color = '#007bff'
-            shiftButton.disabled = true
+            modal.statusDiv.textContent = `Shifting ${selectedItems.length} items by ${days} days...`
+            modal.statusDiv.style.color = '#007bff'
+            modal.shiftButton.disabled = true
 
             let successCount = 0
             let errorCount = 0
@@ -507,14 +584,14 @@ async function ShiftDates() {
                 }
             }
 
-            shiftButton.disabled = false
+            modal.shiftButton.disabled = false
             
             if (errorCount === 0) {
-                statusDiv.textContent = `Successfully shifted ${successCount} items by ${days} days.`
-                statusDiv.style.color = '#28a745'
+                modal.statusDiv.textContent = `Successfully shifted ${successCount} items by ${days} days.`
+                modal.statusDiv.style.color = '#28a745'
             } else {
-                statusDiv.textContent = `Shifted ${successCount} items successfully, ${errorCount} failed.`
-                statusDiv.style.color = '#ffc107'
+                modal.statusDiv.textContent = `Shifted ${successCount} items successfully, ${errorCount} failed.`
+                modal.statusDiv.style.color = '#ffc107'
             }
 
             // Optionally refresh the page after a delay
@@ -524,48 +601,63 @@ async function ShiftDates() {
                 }
             }, 2000)
         }
-
-        content.appendChild(controlSection)
-        content.appendChild(tableContainer)
-
-        modal.appendChild(header)
-        modal.appendChild(content)
-        modalOverlay.appendChild(modal)
-
-        document.body.appendChild(modalOverlay)
-        daysInput.focus()
-
-        return modal
     }
 
-    // Load course items and build modal.
-    async function loadCourseItems(courseID) {
+    // Load course items with progress updates
+    async function loadCourseItems(courseID, modal) {
+        let totalSteps = 3
+        let currentStep = 0
+
+        function updateProgress(stepName) {
+            currentStep++
+            const percentage = Math.round((currentStep / totalSteps) * 100)
+            modal.progressText.textContent = `Loading ${stepName}... ${percentage}%`
+            modal.progressFill.style.width = `${percentage}%`
+        }
+
         try {
-            const [assignments, quizzes, discussions] = await Promise.all([
-                getAssignments(courseID),
-                getQuizzes(courseID),
-                getDiscussions(courseID)
-            ])
+            updateProgress('assignments')
+            const assignments = await getAssignments(courseID)
+            
+            updateProgress('quizzes')
+            const quizzes = await getQuizzes(courseID)
+            
+            updateProgress('discussions')
+            const discussions = await getDiscussions(courseID)
             
             const allItems = [...assignments, ...quizzes, ...discussions]
             console.log(`Loaded ${allItems.length} items with due dates`)
             
             if (allItems.length === 0) {
-                alert('No items with due dates found in this course.')
+                modal.loadingSection.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 20px;">No items with due dates found in this course.</p>'
                 return
             }
+
+            // Hide loading section and show table
+            modal.loadingSection.style.display = 'none'
+            modal.tableContainer.style.display = 'block'
             
-            buildShiftDatesModal(allItems)
+            // Enable controls
+            modal.controlSection.style.opacity = '1'
+            modal.daysInput.disabled = false
+            modal.shiftButton.disabled = false
+            modal.shiftButton.style.opacity = '1'
+            modal.daysInput.focus()
+            
+            // Populate the table
+            populateTable(modal, allItems)
+            
         } catch (err) {
             console.error('Error loading course items:', err)
-            alert('Error loading course items. Please try again.')
+            modal.loadingSection.innerHTML = '<p style="color: #dc3545; text-align: center; padding: 20px;">Error loading course items. Please try again.</p>'
         }
     }
 
-    // Auto-kickoff: load course items and build modal.
+    // Auto-kickoff: build modal first, then load items
     const cid = getCourseID()
     if (cid) {
-        loadCourseItems(cid)
+        const modal = buildShiftDatesModal()
+        loadCourseItems(cid, modal)
     } else {
         console.warn('Cannot detect courseID in URL')
         alert('Cannot detect course ID. Please make sure you are on a Canvas course page.')
