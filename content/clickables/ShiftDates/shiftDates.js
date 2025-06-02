@@ -12,7 +12,7 @@ async function ShiftDates() {
   
     // Generic fetch wrapper with retry and error handling.
     async function fetchJSON(url, retries = 2) {
-        let delayTime = 500
+        let delayTime = 90
         for (let i = 0; i <= retries; i++) {
             try {
                 const res = await fetch(url, {
@@ -45,7 +45,7 @@ async function ShiftDates() {
 
     // Generic PUT request for updating items.
     async function putJSON(url, data, retries = 2) {
-        let delayTime = 500
+        let delayTime = 90
         for (let i = 0; i <= retries; i++) {
             try {
                 const res = await fetch(url, {
