@@ -590,22 +590,91 @@ async function ShiftDates() {
                 return
             }
 
-            modal.statusDiv.textContent = `Shifting ${selectedItems.length} items by ${days} days...`
-            modal.statusDiv.style.color = '#007bff'
-            modal.shiftButton.disabled = true
+            // Hide the table and controls, show updating progress
+            modal.tableContainer.style.display = 'none'
+            modal.controlSection.style.display = 'none'
+            
+            // Create updating section
+            const updatingSection = document.createElement('div')
+            Object.assign(updatingSection.style, {
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: '#666'
+            })
+
+            const updatingText = document.createElement('p')
+            updatingText.textContent = `Updating ${selectedItems.length} items...`
+            Object.assign(updatingText.style, {
+                fontSize: '1.1em',
+                marginBottom: '15px'
+            })
+
+            const updateProgressText = document.createElement('p')
+            updateProgressText.textContent = 'Updating 0%...'
+            Object.assign(updateProgressText.style, {
+                fontSize: '0.9em',
+                color: '#007bff',
+                margin: '5px 0'
+            })
+
+            const updateProgressBar = document.createElement('div')
+            Object.assign(updateProgressBar.style, {
+                width: '100%',
+                height: '8px',
+                backgroundColor: '#e9ecef',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginTop: '10px'
+            })
+
+            const updateProgressFill = document.createElement('div')
+            Object.assign(updateProgressFill.style, {
+                width: '0%',
+                height: '100%',
+                backgroundColor: '#28a745',
+                transition: 'width 0.3s ease'
+            })
+
+            const currentItemText = document.createElement('p')
+            currentItemText.textContent = 'Preparing to update items...'
+            Object.assign(currentItemText.style, {
+                fontSize: '0.8em',
+                color: '#999',
+                margin: '10px 0 0 0',
+                minHeight: '1.2em'
+            })
+
+            updateProgressBar.appendChild(updateProgressFill)
+            updatingSection.appendChild(updatingText)
+            updatingSection.appendChild(updateProgressText)
+            updatingSection.appendChild(updateProgressBar)
+            updatingSection.appendChild(currentItemText)
+
+            // Insert the updating section
+            modal.loadingSection.style.display = 'block'
+            modal.loadingSection.innerHTML = ''
+            modal.loadingSection.appendChild(updatingSection)
 
             let successCount = 0
             let errorCount = 0
 
-            for (const checkbox of selectedItems) {
+            for (let i = 0; i < selectedItems.length; i++) {
+                const checkbox = selectedItems[i]
+                
                 try {
                     const itemId = checkbox.dataset.itemId
                     const itemType = checkbox.dataset.itemType
                     const assignmentId = checkbox.dataset.assignmentId
                     const courseID = getCourseID()
 
-                    // Find the original item to get current dates
+                    // Find the original item to get current dates and title
                     const originalItem = courseItems.find(item => item.id == itemId && item.type === itemType)
+                    
+                    // Update progress display
+                    const percentage = Math.round(((i + 1) / selectedItems.length) * 100)
+                    updateProgressText.textContent = `Updating ${percentage}%...`
+                    updateProgressFill.style.width = `${percentage}%`
+                    currentItemText.textContent = `Updating ${originalItem.type}: ${originalItem.title}`
                     
                     const newDates = {
                         due_at: shiftDate(originalItem.due_at, days),
@@ -627,25 +696,76 @@ async function ShiftDates() {
                 } catch (err) {
                     console.error(`Error updating item ${checkbox.dataset.itemId}:`, err)
                     errorCount++
+                    currentItemText.textContent = `Error updating item. Continuing...`
+                    currentItemText.style.color = '#dc3545'
+                    await delay(500) // Longer delay on error
+                    currentItemText.style.color = '#999'
                 }
             }
 
-            modal.shiftButton.disabled = false
-            
+            // Show completion message
+            const completionSection = document.createElement('div')
+            Object.assign(completionSection.style, {
+                textAlign: 'center',
+                padding: '40px 20px',
+                color: '#666'
+            })
+
+            const completionTitle = document.createElement('h3')
+            completionTitle.textContent = 'Update Complete!'
+            Object.assign(completionTitle.style, {
+                color: errorCount === 0 ? '#28a745' : '#ffc107',
+                marginBottom: '15px'
+            })
+
+            const completionText = document.createElement('p')
             if (errorCount === 0) {
-                modal.statusDiv.textContent = `Successfully shifted ${successCount} items by ${days} days.`
-                modal.statusDiv.style.color = '#28a745'
+                completionText.textContent = `Successfully shifted ${successCount} items by ${days} days.`
+                completionText.style.color = '#28a745'
             } else {
-                modal.statusDiv.textContent = `Shifted ${successCount} items successfully, ${errorCount} failed.`
-                modal.statusDiv.style.color = '#ffc107'
+                completionText.textContent = `Shifted ${successCount} items successfully, ${errorCount} failed.`
+                completionText.style.color = '#ffc107'
             }
+            Object.assign(completionText.style, {
+                fontSize: '1.1em',
+                marginBottom: '20px'
+            })
 
-            // Optionally refresh the page after a delay
-            setTimeout(() => {
-                if (confirm('Dates have been updated. Would you like to refresh the page to see the changes?')) {
-                    window.location.reload()
-                }
-            }, 2000)
+            const refreshButton = document.createElement('button')
+            refreshButton.textContent = 'Refresh Page'
+            Object.assign(refreshButton.style, {
+                padding: '10px 20px',
+                fontSize: '1em',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginRight: '10px'
+            })
+            refreshButton.onclick = () => window.location.reload()
+
+            const closeButton = document.createElement('button')
+            closeButton.textContent = 'Close'
+            Object.assign(closeButton.style, {
+                padding: '10px 20px',
+                fontSize: '1em',
+                backgroundColor: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+            })
+            closeButton.onclick = () => document.getElementById('shift-dates-modal-overlay').remove()
+
+            completionSection.appendChild(completionTitle)
+            completionSection.appendChild(completionText)
+            completionSection.appendChild(refreshButton)
+            completionSection.appendChild(closeButton)
+
+            // Replace updating section with completion section
+            modal.loadingSection.innerHTML = ''
+            modal.loadingSection.appendChild(completionSection)
         }
     }
 
