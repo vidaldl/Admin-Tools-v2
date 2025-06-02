@@ -405,9 +405,36 @@ async function ShiftDates() {
         })
 
         const headers = ['Select', 'Type', 'Title', 'Due Date', 'Unlock Date', 'Lock Date']
-        headers.forEach(headerText => {
+        headers.forEach((headerText, index) => {
             const th = document.createElement('th')
-            th.textContent = headerText
+            
+            if (index === 0) {
+                // Create select all checkbox for the first column
+                const selectAllCheckbox = document.createElement('input')
+                selectAllCheckbox.type = 'checkbox'
+                selectAllCheckbox.title = 'Select/Deselect All'
+                Object.assign(selectAllCheckbox.style, {
+                    marginRight: '5px'
+                })
+                
+                // Add the checkbox and label to the header
+                th.appendChild(selectAllCheckbox)
+                th.appendChild(document.createTextNode('Select'))
+                
+                // Add select all functionality
+                selectAllCheckbox.addEventListener('change', () => {
+                    const allItemCheckboxes = tbody.querySelectorAll('input[type="checkbox"]')
+                    allItemCheckboxes.forEach(checkbox => {
+                        checkbox.checked = selectAllCheckbox.checked
+                    })
+                })
+                
+                // Store reference for later use
+                th.selectAllCheckbox = selectAllCheckbox
+            } else {
+                th.textContent = headerText
+            }
+            
             Object.assign(th.style, {
                 padding: '10px',
                 textAlign: 'left',
@@ -521,6 +548,25 @@ async function ShiftDates() {
                     row.appendChild(lockDateCell)
 
                     tbody.appendChild(row)
+
+                    // Checkbox change event to update select all checkbox state
+                    checkbox.addEventListener('change', () => {
+                        const selectAllCheckbox = thead.querySelector('input[type="checkbox"]')
+                        const allItemCheckboxes = tbody.querySelectorAll('input[type="checkbox"]')
+                        const checkedCount = tbody.querySelectorAll('input[type="checkbox"]:checked').length
+                        
+                        // Update select all checkbox state
+                        if (checkedCount === 0) {
+                            selectAllCheckbox.checked = false
+                            selectAllCheckbox.indeterminate = false
+                        } else if (checkedCount === allItemCheckboxes.length) {
+                            selectAllCheckbox.checked = true
+                            selectAllCheckbox.indeterminate = false
+                        } else {
+                            selectAllCheckbox.checked = false
+                            selectAllCheckbox.indeterminate = true
+                        }
+                    })
                 })
             }
         }
