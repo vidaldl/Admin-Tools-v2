@@ -35,6 +35,12 @@ const clickableScripts = [
     name: "Search in Course", 
     description: "Searches for text in the course and displays a window with all the results.",
     file: "content/clickables/SearchInCourse/searchInCourse.js"
+  },
+  {
+    id: "shiftDates", 
+    name: "Shift Course Dates", 
+    description: "Changes the dates of all assignments, quizzes, discussions, and announcements in the course by a specified number of days.",
+    file: "content/clickables/ShiftDates/shiftDates.js"
   }
   // Add more clickable scripts as needed
 ];
