@@ -249,7 +249,7 @@ async function ShiftDates() {
             padding: '20px 0 0 0'
         })
 
-        // Control section (initially disabled)
+        // Control section (initially disabled).
         const controlSection = document.createElement('div')
         Object.assign(controlSection.style, {
             marginBottom: '20px',
@@ -307,7 +307,7 @@ async function ShiftDates() {
         controlSection.appendChild(shiftButton)
         controlSection.appendChild(statusDiv)
 
-        // Loading section
+        // Loading section.
         const loadingSection = document.createElement('div')
         Object.assign(loadingSection.style, {
             textAlign: 'center',
@@ -354,7 +354,7 @@ async function ShiftDates() {
         loadingSection.appendChild(progressText)
         loadingSection.appendChild(progressBar)
 
-        // Table container (initially hidden)
+        // Table container (initially hidden).
         const tableContainer = document.createElement('div')
         Object.assign(tableContainer.style, {
             maxHeight: '60vh',
@@ -374,7 +374,7 @@ async function ShiftDates() {
 
         document.body.appendChild(modalOverlay)
 
-        // Store references for later use
+        // Store references for later use.
         modal.controlSection = controlSection
         modal.loadingSection = loadingSection
         modal.tableContainer = tableContainer
@@ -387,7 +387,7 @@ async function ShiftDates() {
         return modal
     }
 
-    // Populate the table with loaded items
+    // Populate the table with loaded items.
     function populateTable(modal, courseItems) {
         const table = document.createElement('table')
         Object.assign(table.style, {
@@ -396,7 +396,7 @@ async function ShiftDates() {
             fontSize: '0.9em'
         })
 
-        // Table header
+        // Table header.
         const thead = document.createElement('thead')
         const headerRow = document.createElement('tr')
         Object.assign(headerRow.style, {
@@ -409,7 +409,7 @@ async function ShiftDates() {
             const th = document.createElement('th')
             
             if (index === 0) {
-                // Create select all checkbox for the first column
+                // Add select all checkbox.
                 const selectAllCheckbox = document.createElement('input')
                 selectAllCheckbox.type = 'checkbox'
                 selectAllCheckbox.title = 'Select/Deselect All'
@@ -417,11 +417,10 @@ async function ShiftDates() {
                     marginRight: '5px'
                 })
                 
-                // Add the checkbox and label to the header
                 th.appendChild(selectAllCheckbox)
                 th.appendChild(document.createTextNode('Select'))
                 
-                // Add select all functionality
+                // Setup select all checkbox behavior.
                 selectAllCheckbox.addEventListener('change', () => {
                     const allItemCheckboxes = tbody.querySelectorAll('input[type="checkbox"]')
                     allItemCheckboxes.forEach(checkbox => {
@@ -429,7 +428,6 @@ async function ShiftDates() {
                     })
                 })
                 
-                // Store reference for later use
                 th.selectAllCheckbox = selectAllCheckbox
             } else {
                 th.textContent = headerText
@@ -447,10 +445,10 @@ async function ShiftDates() {
         thead.appendChild(headerRow)
         table.appendChild(thead)
 
-        // Table body
+        // Table body.
         const tbody = document.createElement('tbody')
         
-        // Group items by type
+        // Group items by type.
         const groupedItems = {
             assignments: courseItems.filter(item => item.type === 'assignment'),
             quizzes: courseItems.filter(item => item.type === 'quiz'),
@@ -459,7 +457,7 @@ async function ShiftDates() {
 
         for (const [groupName, items] of Object.entries(groupedItems)) {
             if (items.length > 0) {
-                // Group header
+                // Group header row.
                 const groupRow = document.createElement('tr')
                 Object.assign(groupRow.style, {
                     backgroundColor: '#f8f9fa',
@@ -476,14 +474,14 @@ async function ShiftDates() {
                 groupRow.appendChild(groupCell)
                 tbody.appendChild(groupRow)
 
-                // Items
+                // Item rows.
                 items.forEach(item => {
                     const row = document.createElement('tr')
                     Object.assign(row.style, {
                         borderBottom: '1px solid #dee2e6'
                     })
 
-                    // Checkbox
+                    // Checkbox cell.
                     const checkboxCell = document.createElement('td')
                     Object.assign(checkboxCell.style, {
                         padding: '8px 10px',
@@ -498,7 +496,7 @@ async function ShiftDates() {
                     checkboxCell.appendChild(checkbox)
                     row.appendChild(checkboxCell)
 
-                    // Type
+                    // Type cell.
                     const typeCell = document.createElement('td')
                     typeCell.textContent = item.type.charAt(0).toUpperCase() + item.type.slice(1)
                     Object.assign(typeCell.style, {
@@ -507,7 +505,7 @@ async function ShiftDates() {
                     })
                     row.appendChild(typeCell)
 
-                    // Title
+                    // Title cell.
                     const titleCell = document.createElement('td')
                     titleCell.textContent = item.title
                     Object.assign(titleCell.style, {
@@ -521,7 +519,7 @@ async function ShiftDates() {
                     titleCell.title = item.title
                     row.appendChild(titleCell)
 
-                    // Due Date
+                    // Due date cell.
                     const dueDateCell = document.createElement('td')
                     dueDateCell.textContent = formatDate(item.due_at)
                     Object.assign(dueDateCell.style, {
@@ -530,7 +528,7 @@ async function ShiftDates() {
                     })
                     row.appendChild(dueDateCell)
 
-                    // Unlock Date
+                    // Unlock date cell.
                     const unlockDateCell = document.createElement('td')
                     unlockDateCell.textContent = formatDate(item.unlock_at)
                     Object.assign(unlockDateCell.style, {
@@ -539,7 +537,7 @@ async function ShiftDates() {
                     })
                     row.appendChild(unlockDateCell)
 
-                    // Lock Date
+                    // Lock date cell.
                     const lockDateCell = document.createElement('td')
                     lockDateCell.textContent = formatDate(item.lock_at)
                     Object.assign(lockDateCell.style, {
@@ -549,13 +547,12 @@ async function ShiftDates() {
 
                     tbody.appendChild(row)
 
-                    // Checkbox change event to update select all checkbox state
+                    // Update select all checkbox state when individual checkboxes change.
                     checkbox.addEventListener('change', () => {
                         const selectAllCheckbox = thead.querySelector('input[type="checkbox"]')
                         const allItemCheckboxes = tbody.querySelectorAll('input[type="checkbox"]')
                         const checkedCount = tbody.querySelectorAll('input[type="checkbox"]:checked').length
                         
-                        // Update select all checkbox state
                         if (checkedCount === 0) {
                             selectAllCheckbox.checked = false
                             selectAllCheckbox.indeterminate = false
@@ -574,7 +571,7 @@ async function ShiftDates() {
         table.appendChild(tbody)
         modal.tableContainer.appendChild(table)
 
-        // Set up shift button click handler
+        // Set up shift button click handler.
         modal.shiftButton.onclick = async () => {
             const days = parseInt(modal.daysInput.value)
             if (isNaN(days)) {
@@ -590,11 +587,11 @@ async function ShiftDates() {
                 return
             }
 
-            // Hide the table and controls, show updating progress
+            // Hide table and show update interface.
             modal.tableContainer.style.display = 'none'
             modal.controlSection.style.display = 'none'
             
-            // Create updating section
+            // Create updating interface.
             const updatingSection = document.createElement('div')
             Object.assign(updatingSection.style, {
                 textAlign: 'center',
@@ -650,7 +647,7 @@ async function ShiftDates() {
             updatingSection.appendChild(updateProgressBar)
             updatingSection.appendChild(currentItemText)
 
-            // Insert the updating section
+            // Display updating interface.
             modal.loadingSection.style.display = 'block'
             modal.loadingSection.innerHTML = ''
             modal.loadingSection.appendChild(updatingSection)
@@ -667,10 +664,10 @@ async function ShiftDates() {
                     const assignmentId = checkbox.dataset.assignmentId
                     const courseID = getCourseID()
 
-                    // Find the original item to get current dates and title
+                    // Find original item.
                     const originalItem = courseItems.find(item => item.id == itemId && item.type === itemType)
                     
-                    // Update progress display
+                    // Update progress display.
                     const percentage = Math.round(((i + 1) / selectedItems.length) * 100)
                     updateProgressText.textContent = `Updating ${percentage}%...`
                     updateProgressFill.style.width = `${percentage}%`
@@ -682,7 +679,7 @@ async function ShiftDates() {
                         lock_at: shiftDate(originalItem.lock_at, days)
                     }
 
-                    // Update based on item type
+                    // Update item based on type.
                     if (itemType === 'assignment') {
                         await updateAssignment(courseID, itemId, newDates)
                     } else if (itemType === 'quiz') {
@@ -692,18 +689,18 @@ async function ShiftDates() {
                     }
 
                     successCount++
-                    await delay(100) // Small delay between requests
+                    await delay(100) // Small delay between requests.
                 } catch (err) {
                     console.error(`Error updating item ${checkbox.dataset.itemId}:`, err)
                     errorCount++
                     currentItemText.textContent = `Error updating item. Continuing...`
                     currentItemText.style.color = '#dc3545'
-                    await delay(500) // Longer delay on error
+                    await delay(500) // Longer delay on error.
                     currentItemText.style.color = '#999'
                 }
             }
 
-            // Show completion message
+            // Show completion message.
             const completionSection = document.createElement('div')
             Object.assign(completionSection.style, {
                 textAlign: 'center',
@@ -763,13 +760,13 @@ async function ShiftDates() {
             completionSection.appendChild(refreshButton)
             completionSection.appendChild(closeButton)
 
-            // Replace updating section with completion section
+            // Show completion interface.
             modal.loadingSection.innerHTML = ''
             modal.loadingSection.appendChild(completionSection)
         }
     }
 
-    // Load course items with progress updates
+    // Load course items with progress updates.
     async function loadCourseItems(courseID, modal) {
         let totalSteps = 3
         let currentStep = 0
@@ -799,18 +796,18 @@ async function ShiftDates() {
                 return
             }
 
-            // Hide loading section and show table
+            // Switch to table view.
             modal.loadingSection.style.display = 'none'
             modal.tableContainer.style.display = 'block'
             
-            // Enable controls
+            // Enable controls.
             modal.controlSection.style.opacity = '1'
             modal.daysInput.disabled = false
             modal.shiftButton.disabled = false
             modal.shiftButton.style.opacity = '1'
             modal.daysInput.focus()
             
-            // Populate the table
+            // Populate table.
             populateTable(modal, allItems)
             
         } catch (err) {
@@ -819,7 +816,7 @@ async function ShiftDates() {
         }
     }
 
-    // Auto-kickoff: build modal first, then load items
+    // Auto-kickoff: build modal first, then load items.
     const cid = getCourseID()
     if (cid) {
         const modal = buildShiftDatesModal()
