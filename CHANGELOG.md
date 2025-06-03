@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.3] - 2025-06-03
+### Added
+- Added "Shift Dates" functionality that shifts the dates of selected course items by the specified number of days.
+
 ## [2.3.2] - 2025-05-23
 ### Added
 - Patch: fixed performance loading for Search in Course.

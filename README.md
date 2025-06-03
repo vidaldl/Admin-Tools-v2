@@ -13,6 +13,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Unlock Blueprint Items](#unlock-blueprint-items)
     - [Copy Broken Links](#copy-broken-links)
     - [Search In Course](#search-in-course)
+    - [Shift Course Dates](#shift-course-dates)
   - [Displays](#displays)
     - [Sections Column](#sections-column)
     - [Sections in Breadcrumbs](#sections-in-breadcrumbs)
@@ -87,10 +88,26 @@ Displays a window with all broken links in the course and allows you to copy the
 Displays a window with a search bar that allows the search of any text in the content of the course.
 
 **Usage:**
-1. Navigate to the hom epage of any course 
+1. Navigate to the home page of any course 
 2. Open the extension popup.  
 3. Click the **Search in Course** button.
 4. After loading is complete, search any text in the course content.
+
+#### Shift Course Dates
+<img alt="Shift Course Dates Button" src="content/clickables/ShiftDates/ShiftCourseDates.png" width="300">
+
+<img alt="Shift Course Dates Window" src="content/clickables/ShiftDates/ShiftCourseDates-2.png" width="400">
+
+Displays a window that allows to shift the dates of selected course items by the specified number of days.
+
+**Usage:**
+1. Open the **Home** page for any course.  
+2. Click the extension icon in your browser to open its popup.  
+3. Select **Shift Course Dates**.  
+4. When all course assets have finished loading, check the boxes next to the items whose dates you want to adjust.  
+5. In **Days to shift**, enter the number of days to move the dates (use a negative number to shift backward).  
+6. Click **Shift Selected Dates** to begin the process.
+
 
 ### Displays
 
