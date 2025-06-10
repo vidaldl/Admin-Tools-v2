@@ -41,6 +41,12 @@ const clickableScripts = [
     name: "Shift Course Dates", 
     description: "Changes the dates of all assignments, quizzes, discussions, and announcements in the course by a specified number of days.",
     file: "content/clickables/ShiftDates/shiftDates.js"
+  },
+  {
+    id: "setupDates", 
+    name: "Set Up Course Dates", 
+    description: "Displays a window that assists with the process of setting up a course without dates.",
+    file: "content/clickables/SetupDates/setupDates.js"
   }
   // Add more clickable scripts as needed
 ];
