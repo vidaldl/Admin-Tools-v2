@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.0] - 2025-06-18
+### Added
+- Added "Bulk Link Opener" functionality that Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.
+
 ## [2.3.3] - 2025-06-03
 ### Added
 - Added "Shift Dates" functionality that shifts the dates of selected course items by the specified number of days.
