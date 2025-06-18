@@ -103,6 +103,14 @@ const displayScripts = [
     name: "Sort Navigation Button",
     description: `Adds a "Sort Navigation" button to the "Navigation" tab's disabled items in the course settings page in Canvas.`,
     runAt: "document_idle"
+  },
+  {
+    id: "bulkLinkOpener",
+    file: "content/displays/BulkLinkOpener/bulkLinkOpener.js",
+    matches: ["<all_urls>"],
+    name: "Bulk Link Opener",
+    description: `Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.`,
+    runAt: "document_idle"
   }
   // Add additional display scripts as needed
 ];
@@ -229,6 +237,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       height: 470,
       focused: true
     });
+  } else if (msg.action === "openLink") {    
+      chrome.tabs.create({ url: msg.url });
   }
 });
 
