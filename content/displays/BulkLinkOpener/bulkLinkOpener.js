@@ -4,6 +4,8 @@ function bulkLinkOpener() {
     let startX, startY;
     let boxEl = null;
     let linkCounter = null;
+    let notificationEl = null;
+    let notificationTimer = null;
 
     // Create link counter element
     function createLinkCounter() {
@@ -11,17 +13,38 @@ function bulkLinkOpener() {
         linkCounter.id = 'bulk-link-counter';
         linkCounter.style.cssText = `
             position: fixed;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 4px 8px;
+            padding: 6px 12px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             pointer-events: none;
             z-index: 999999;
             display: none;
+            border: 2px solid #4287f5;
         `;
         document.body.appendChild(linkCounter);
+        
+        // Create notification element
+        notificationEl = document.createElement('div');
+        notificationEl.id = 'bulk-link-notification';
+        notificationEl.style.cssText = `
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 999999;
+            display: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border-left: 4px solid #ff6b6b;
+        `;
+        notificationEl.textContent = 'Release to open selected links';
+        document.body.appendChild(notificationEl);
     }
     
     // Create counter element right away
@@ -53,6 +76,17 @@ function bulkLinkOpener() {
         
         return selectedLinks;
     }
+    
+    // Clear notification timer
+    function clearNotification() {
+        if (notificationTimer) {
+            clearTimeout(notificationTimer);
+            notificationTimer = null;
+        }
+        if (notificationEl) {
+            notificationEl.style.display = 'none';
+        }
+    }
 
     // Handle key down - check for Z key
     document.addEventListener('keydown', e => {
@@ -65,6 +99,7 @@ function bulkLinkOpener() {
     document.addEventListener('keyup', e => {
         if (e.key.toLowerCase() === 'z') {
             zPressed = false;
+            
             if (boxEl) {
                 boxEl.remove();
                 boxEl = null;
@@ -73,12 +108,15 @@ function bulkLinkOpener() {
             if (linkCounter) {
                 linkCounter.style.display = 'none';
             }
+            
+            clearNotification();
         }
     });
 
     // Handle mouse down - start drawing selection box
     document.addEventListener('mousedown', e => {
         if (!zPressed) return;
+        
         isDrawing = true;
         startX = e.pageX;
         startY = e.pageY;
@@ -87,8 +125,8 @@ function bulkLinkOpener() {
         boxEl = document.createElement('div');
         boxEl.style.cssText = `
             position: absolute;
-            border: 2px dashed blue;
-            background-color: rgba(0, 0, 255, 0.1);
+            border: 3px dashed #4287f5;
+            background-color: rgba(66, 135, 245, 0.2);
             z-index: 999998;
             pointer-events: none;
         `;
@@ -102,12 +140,22 @@ function bulkLinkOpener() {
             linkCounter.style.top = (e.pageY + 20) + 'px';
         }
         
+        // Set a timer for notification after 3 seconds
+        clearNotification();
+        notificationTimer = setTimeout(() => {
+            if (isDrawing && notificationEl) {
+                notificationEl.style.display = 'block';
+                notificationEl.style.left = (e.pageX - 50) + 'px';
+                notificationEl.style.top = (e.pageY + 50) + 'px';
+            }
+        }, 3000);
+        
         e.preventDefault();
     });
 
     // Handle mouse move - update selection box
     document.addEventListener('mousemove', e => {
-        if (!isDrawing) return;  // Fixed missing return statement
+        if (!isDrawing) return;
         
         const width = Math.abs(e.pageX - startX);
         const height = Math.abs(e.pageY - startY);
@@ -130,12 +178,18 @@ function bulkLinkOpener() {
             linkCounter.style.top = (e.pageY + 20) + 'px';
         }
         
+        // Update notification position if visible
+        if (notificationEl && notificationEl.style.display === 'block') {
+            notificationEl.style.left = (e.pageX - 50) + 'px';
+            notificationEl.style.top = (e.pageY + 50) + 'px';
+        }
+        
         e.preventDefault();
     });
 
     // Handle mouse up - process selected links
     document.addEventListener('mouseup', e => {
-        if (!isDrawing) return;  // Fixed missing return statement
+        if (!isDrawing) return;
         isDrawing = false;
         
         // Get selected links
@@ -148,7 +202,11 @@ function bulkLinkOpener() {
         
         // Open each selected link in a new tab
         selectedLinks.forEach(link => {
-            window.open(link.href, '_blank');
+            try {
+                window.open(link.href, '_blank');
+            } catch (err) {
+                // Silent error handling
+            }
         });
         
         // Hide the counter
@@ -156,9 +214,17 @@ function bulkLinkOpener() {
             linkCounter.style.display = 'none';
         }
         
+        // Clear notification
+        clearNotification();
+        
         e.preventDefault();
     });
 }
 
-bulkLinkOpener();
+// Run immediately on script load
+try {
+    bulkLinkOpener();
+} catch (err) {
+    // Silent error handling
+}
 
