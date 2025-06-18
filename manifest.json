@@ -20,12 +20,13 @@
       "open_in_tab": true
     },
     "permissions": [
+      "tabs",
       "storage",
       "scripting",
       "activeTab",
       "windows"
     ],
     "host_permissions": [
-      "https://byui.instructure.com/*"
+      "<all_urls>"
     ]
   }
