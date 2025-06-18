@@ -20,7 +20,6 @@
       "open_in_tab": true
     },
     "permissions": [
-      "tabs",
       "storage",
       "scripting",
       "activeTab",

@@ -115,6 +115,8 @@ async function SearchInCourse() {
         }
         return result
     }
+
+
   
     // Fetch discussions with pagination.
     async function getDiscussions(courseID, reportItemAttempted, updateTotalItems) {
@@ -152,6 +154,29 @@ async function SearchInCourse() {
         return results
     }
   
+    // Fetch syllabus content
+    async function getSyllabus(courseID, reportItemAttempted, updateTotalItems) {
+        if (updateTotalItems) updateTotalItems(1); // Just one syllabus to fetch
+        try {
+            const courseData = await fetchJSON(`/api/v1/courses/${courseID}?include[]=syllabus_body`);
+            if (reportItemAttempted) reportItemAttempted();
+            
+            // Only add if there's actual content in the syllabus
+            if (courseData.syllabus_body && courseData.syllabus_body.trim() !== '') {
+                return [{
+                    id: courseID,
+                    title: 'Course Syllabus',
+                    body: courseData.syllabus_body,
+                    url: 'syllabus' // For direct linking
+                }];
+            }
+            return [];
+        } catch (err) {
+            console.error('Error loading syllabus:', err);
+            return [];
+        }
+    }
+  
     // Extract courseID from the current URL.
     function getCourseID() {
         const m = window.location.pathname.match(/\/courses\/(\d+)/)
@@ -184,16 +209,23 @@ async function SearchInCourse() {
         }
     
         try {
-            const [pages, assignments, quizzes, discussions] = await Promise.all([
+            const [pages, assignments, quizzes, discussions, syllabus] = await Promise.all([
                 getPages(courseID, reportItemAttempted, updateTotalItems),
                 getAssignments(courseID, reportItemAttempted, updateTotalItems),
                 getQuizzes(courseID, reportItemAttempted, updateTotalItems),
-                getDiscussions(courseID, reportItemAttempted, updateTotalItems)
-            ])
-            window.adminToolsCourseContent = { pages, assignments, quizzes, discussions }
+                getDiscussions(courseID, reportItemAttempted, updateTotalItems),
+                getSyllabus(courseID, reportItemAttempted, updateTotalItems)
+            ]);
+            window.adminToolsCourseContent = { 
+                pages, 
+                assignments, 
+                quizzes, 
+                discussions, 
+                syllabus 
+            };
             console.log('courseContent ready', window.adminToolsCourseContent)
             if (queryStatus) queryStatus.textContent = 'Ready to search'
-            return window.adminToolsCourseContent
+            return window.adminToolsCourseContent;
         } catch (err) {
             console.error('Error building course content:', err)
             if (queryStatus) queryStatus.textContent = 'Error loading content. Try again later.'
@@ -509,6 +541,9 @@ async function SearchInCourse() {
                             break
                         case 'discussions':
                             itemUrl = `${courseURL}/discussion_topics/${item.id}`
+                            break
+                        case 'syllabus':
+                            itemUrl = `${courseURL}/syllabus`
                             break
                     }
     
