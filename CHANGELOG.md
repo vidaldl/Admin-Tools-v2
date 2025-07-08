@@ -3,6 +3,7 @@
 ## [2.4.0] - 2025-06-18
 ### Added
 - Added "Bulk Link Opener" functionality that Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.
+- Fixed "Search In Course" to also search in a course's syllabus.
 
 ## [2.3.3] - 2025-06-03
 ### Added
