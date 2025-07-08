@@ -6,8 +6,18 @@ function bulkLinkOpener() {
     let linkCounter = null;
     let notificationEl = null;
     let notificationTimer = null;
+    const prevHighlighted = new Set();
 
-    // Create link counter element
+    // 1) Inject CSS for link highlighting
+    const style = document.createElement('style');
+    style.textContent = `
+      a.bulk-link-highlight {
+        outline: 2px solid #4287f5 !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // 2) Create link counter + notification elements
     function createLinkCounter() {
         linkCounter = document.createElement('div');
         linkCounter.id = 'bulk-link-counter';
@@ -26,7 +36,6 @@ function bulkLinkOpener() {
         `;
         document.body.appendChild(linkCounter);
         
-        // Create notification element
         notificationEl = document.createElement('div');
         notificationEl.id = 'bulk-link-notification';
         notificationEl.style.cssText = `
@@ -46,82 +55,56 @@ function bulkLinkOpener() {
         notificationEl.textContent = 'Release to open selected links';
         document.body.appendChild(notificationEl);
     }
-    
-    // Create counter element right away
     createLinkCounter();
 
-    // Function to get links within selection box
+    // 3) Utility: get all links overlapping the selection box
     function getLinksInSelection() {
-        if (!boxEl) {
-            return [];
-        }
-        
+        if (!boxEl) return [];
         const boxRect = boxEl.getBoundingClientRect();
-        const links = document.querySelectorAll('a[href]');
-        const selectedLinks = [];
-        
-        links.forEach(link => {
-            const linkRect = link.getBoundingClientRect();
-            
-            // Check if the link overlaps with the selection box
-            if (
-                linkRect.left < boxRect.right &&
-                linkRect.right > boxRect.left &&
-                linkRect.top < boxRect.bottom &&
-                linkRect.bottom > boxRect.top
-            ) {
-                selectedLinks.push(link);
-            }
+        return Array.from(document.querySelectorAll('a[href]')).filter(link => {
+            const r = link.getBoundingClientRect();
+            return (
+                r.left < boxRect.right &&
+                r.right > boxRect.left &&
+                r.top < boxRect.bottom &&
+                r.bottom > boxRect.top
+            );
         });
-        
-        return selectedLinks;
     }
-    
-    // Clear notification timer
+
+    // 4) Utility: clear pending notification
     function clearNotification() {
         if (notificationTimer) {
             clearTimeout(notificationTimer);
             notificationTimer = null;
         }
-        if (notificationEl) {
-            notificationEl.style.display = 'none';
-        }
+        notificationEl.style.display = 'none';
     }
 
-    // Handle key down - check for Z key
+    // 5) Key handlers: track Z press/release
     document.addEventListener('keydown', e => {
-        if (e.key.toLowerCase() === 'z') {
-            zPressed = true;
-        }
+        if (e.key.toLowerCase() === 'z') zPressed = true;
     });
-
-    // Handle key up - check for Z key release
     document.addEventListener('keyup', e => {
         if (e.key.toLowerCase() === 'z') {
             zPressed = false;
-            
-            if (boxEl) {
-                boxEl.remove();
-                boxEl = null;
-            }
-            
-            if (linkCounter) {
-                linkCounter.style.display = 'none';
-            }
-            
+            // cancel any in-progress draw
+            if (boxEl) { boxEl.remove(); boxEl = null; }
+            linkCounter.style.display = 'none';
             clearNotification();
+            // remove any leftover highlights
+            prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
+            prevHighlighted.clear();
         }
     });
 
-    // Handle mouse down - start drawing selection box
+    // 6) Mouse down: begin selection
     document.addEventListener('mousedown', e => {
-        if (!zPressed) return;
-        
+        if (!zPressed || e.button !== 0) return;
         isDrawing = true;
         startX = e.pageX;
         startY = e.pageY;
-        
-        // Create box element
+
         boxEl = document.createElement('div');
         boxEl.style.cssText = `
             position: absolute;
@@ -131,92 +114,82 @@ function bulkLinkOpener() {
             pointer-events: none;
         `;
         document.body.appendChild(boxEl);
-        
-        // Initialize counter near mouse cursor
-        if (linkCounter) {
-            linkCounter.textContent = '0 links';
-            linkCounter.style.display = 'block';
-            linkCounter.style.left = (e.pageX - 50) + 'px';
-            linkCounter.style.top = (e.pageY + 20) + 'px';
-        }
-        
-        // Set a timer for notification after 3 seconds
+
+        linkCounter.textContent = '0 links';
+        linkCounter.style.display = 'block';
+        linkCounter.style.left = (e.clientX - 50) + 'px';
+        linkCounter.style.top = (e.clientY + 20) + 'px';
+
         clearNotification();
         notificationTimer = setTimeout(() => {
-            if (isDrawing && notificationEl) {
+            if (isDrawing) {
                 notificationEl.style.display = 'block';
                 notificationEl.style.left = (e.pageX - 50) + 'px';
                 notificationEl.style.top = (e.pageY + 50) + 'px';
             }
         }, 3000);
-        
+
         e.preventDefault();
     });
 
-    // Handle mouse move - update selection box
+    // 7) Mouse move: resize box, update counter & highlight links
     document.addEventListener('mousemove', e => {
-        if (!isDrawing) return;
-        
+        if (!isDrawing || !boxEl) return;
+
+        const left = Math.min(startX, e.pageX);
+        const top = Math.min(startY, e.pageY);
         const width = Math.abs(e.pageX - startX);
         const height = Math.abs(e.pageY - startY);
-        
-        let left = Math.min(startX, e.pageX);
-        let top = Math.min(startY, e.pageY);
-        
-        boxEl.style.left = left + 'px';
-        boxEl.style.top = top + 'px';
-        boxEl.style.width = width + 'px';
-        boxEl.style.height = height + 'px';
-        
-        // Update counter content
-        const selectedLinks = getLinksInSelection();
-        const linkCount = selectedLinks.length;
-        
-        if (linkCounter) {
-            linkCounter.textContent = `${linkCount} link${linkCount !== 1 ? 's' : ''}`;
-            linkCounter.style.left = (e.pageX - 50) + 'px';
-            linkCounter.style.top = (e.pageY + 20) + 'px';
-        }
-        
-        // Update notification position if visible
-        if (notificationEl && notificationEl.style.display === 'block') {
+
+        Object.assign(boxEl.style, {
+            left: left + 'px',
+            top: top + 'px',
+            width: width + 'px',
+            height: height + 'px'
+        });
+
+        const selected = getLinksInSelection();
+        const count = selected.length;
+        linkCounter.textContent = `${count} link${count !== 1 ? 's' : ''}`;
+        linkCounter.style.left = (e.clientX - 50) + 'px';
+        linkCounter.style.top = (e.clientY + 20) + 'px';
+
+        // Highlight logic
+        prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
+        prevHighlighted.clear();
+        selected.forEach(l => {
+            l.classList.add('bulk-link-highlight');
+            prevHighlighted.add(l);
+        });
+
+        if (notificationEl.style.display === 'block') {
             notificationEl.style.left = (e.pageX - 50) + 'px';
             notificationEl.style.top = (e.pageY + 50) + 'px';
         }
-        
+
         e.preventDefault();
     });
 
-    // Handle mouse up - process selected links
+    // 8) Mouse up: open links & clean up
     document.addEventListener('mouseup', e => {
         if (!isDrawing) return;
         isDrawing = false;
-        
-        // Get selected links
-        const selectedLinks = getLinksInSelection();
-        
-        if (boxEl) {
-            boxEl.remove();
-            boxEl = null;
-        }
-        
-        // Open each selected link in a new tab
-        selectedLinks.forEach(link => {
-            try {
-                window.open(link.href, '_blank');
-            } catch (err) {
-                // Silent error handling
-            }
+
+        const selected = getLinksInSelection();
+        if (boxEl) { boxEl.remove(); boxEl = null; }
+
+        selected.forEach(link => {
+            try { window.open(link.href, '_blank'); }
+            catch (err) { /* ignore */ }
         });
-        
-        // Hide the counter
-        if (linkCounter) {
-            linkCounter.style.display = 'none';
-        }
-        
-        // Clear notification
+
+        linkCounter.style.display = 'none';
         clearNotification();
-        
+
+        // Remove highlights
+        prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
+        prevHighlighted.clear();
+
         e.preventDefault();
     });
 }
