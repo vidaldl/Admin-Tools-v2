@@ -8,16 +8,16 @@ function bulkLinkOpener() {
     let notificationTimer = null;
     const prevHighlighted = new Set();
 
-    // 1) Inject CSS for link highlighting
+    // Inject CSS for link highlighting
     const style = document.createElement('style');
     style.textContent = `
       a.bulk-link-highlight {
-        outline: 2px solid #4287f5 !important;
+        outline: 2px solid #e67e22 !important;
       }
     `;
     document.head.appendChild(style);
 
-    // 2) Create link counter + notification elements
+    // Create link counter + notification elements
     function createLinkCounter() {
         linkCounter = document.createElement('div');
         linkCounter.id = 'bulk-link-counter';
@@ -57,7 +57,7 @@ function bulkLinkOpener() {
     }
     createLinkCounter();
 
-    // 3) Utility: get all links overlapping the selection box
+    // Get all links overlapping the selection box
     function getLinksInSelection() {
         if (!boxEl) return [];
         const boxRect = boxEl.getBoundingClientRect();
@@ -72,7 +72,7 @@ function bulkLinkOpener() {
         });
     }
 
-    // 4) Utility: clear pending notification
+    // Clear pending notification
     function clearNotification() {
         if (notificationTimer) {
             clearTimeout(notificationTimer);
@@ -81,24 +81,41 @@ function bulkLinkOpener() {
         notificationEl.style.display = 'none';
     }
 
-    // 5) Key handlers: track Z press/release
+    // Reset Z-key & drawing state (on blur/visibility change)
+    function resetZState() {
+        zPressed = false;
+        if (isDrawing) {
+            isDrawing = false;
+            if (boxEl) {
+                boxEl.remove();
+                boxEl = null;
+            }
+            linkCounter.style.display = 'none';
+            clearNotification();
+            prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
+            prevHighlighted.clear();
+        }
+    }
+
+    // Key handlers: track Z press/release
     document.addEventListener('keydown', e => {
         if (e.key.toLowerCase() === 'z') zPressed = true;
     });
     document.addEventListener('keyup', e => {
         if (e.key.toLowerCase() === 'z') {
-            zPressed = false;
-            // cancel any in-progress draw
-            if (boxEl) { boxEl.remove(); boxEl = null; }
-            linkCounter.style.display = 'none';
-            clearNotification();
-            // remove any leftover highlights
-            prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
-            prevHighlighted.clear();
+            resetZState();
         }
     });
 
-    // 6) Mouse down: begin selection
+    // Handle window/tab losing focus
+    window.addEventListener('blur', resetZState);
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            resetZState();
+        }
+    });
+
+    // Mouse down: begin selection
     document.addEventListener('mousedown', e => {
         if (!zPressed || e.button !== 0) return;
         isDrawing = true;
@@ -118,41 +135,41 @@ function bulkLinkOpener() {
         linkCounter.textContent = '0 links';
         linkCounter.style.display = 'block';
         linkCounter.style.left = (e.clientX - 50) + 'px';
-        linkCounter.style.top = (e.clientY + 20) + 'px';
+        linkCounter.style.top  = (e.clientY + 20) + 'px';
 
         clearNotification();
         notificationTimer = setTimeout(() => {
             if (isDrawing) {
                 notificationEl.style.display = 'block';
-                notificationEl.style.left = (e.pageX - 50) + 'px';
-                notificationEl.style.top = (e.pageY + 50) + 'px';
+                notificationEl.style.left = (e.clientX - 50) + 'px';
+                notificationEl.style.top  = (e.clientY + 50) + 'px';
             }
         }, 3000);
 
         e.preventDefault();
     });
 
-    // 7) Mouse move: resize box, update counter & highlight links
+    // Mouse move: resize box, update counter & highlight links
     document.addEventListener('mousemove', e => {
         if (!isDrawing || !boxEl) return;
 
-        const left = Math.min(startX, e.pageX);
-        const top = Math.min(startY, e.pageY);
-        const width = Math.abs(e.pageX - startX);
+        const left   = Math.min(startX, e.pageX);
+        const top    = Math.min(startY, e.pageY);
+        const width  = Math.abs(e.pageX - startX);
         const height = Math.abs(e.pageY - startY);
 
         Object.assign(boxEl.style, {
-            left: left + 'px',
-            top: top + 'px',
-            width: width + 'px',
-            height: height + 'px'
+            left:   left  + 'px',
+            top:    top   + 'px',
+            width:  width + 'px',
+            height: height+ 'px'
         });
 
         const selected = getLinksInSelection();
-        const count = selected.length;
+        const count    = selected.length;
         linkCounter.textContent = `${count} link${count !== 1 ? 's' : ''}`;
         linkCounter.style.left = (e.clientX - 50) + 'px';
-        linkCounter.style.top = (e.clientY + 20) + 'px';
+        linkCounter.style.top  = (e.clientY + 20) + 'px';
 
         // Highlight logic
         prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
@@ -163,20 +180,23 @@ function bulkLinkOpener() {
         });
 
         if (notificationEl.style.display === 'block') {
-            notificationEl.style.left = (e.pageX - 50) + 'px';
-            notificationEl.style.top = (e.pageY + 50) + 'px';
+            notificationEl.style.left = (e.clientX - 50) + 'px';
+            notificationEl.style.top  = (e.clientY + 50) + 'px';
         }
 
         e.preventDefault();
     });
 
-    // 8) Mouse up: open links & clean up
+    // Mouse up: open links & clean up
     document.addEventListener('mouseup', e => {
         if (!isDrawing) return;
         isDrawing = false;
 
         const selected = getLinksInSelection();
-        if (boxEl) { boxEl.remove(); boxEl = null; }
+        if (boxEl) {
+            boxEl.remove();
+            boxEl = null;
+        }
 
         selected.forEach(link => {
             try { window.open(link.href, '_blank'); }
@@ -186,7 +206,6 @@ function bulkLinkOpener() {
         linkCounter.style.display = 'none';
         clearNotification();
 
-        // Remove highlights
         prevHighlighted.forEach(l => l.classList.remove('bulk-link-highlight'));
         prevHighlighted.clear();
 
