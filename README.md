@@ -14,6 +14,7 @@ This extension is a refactored version of [BYUI Canvas Admin Tools](https://gith
     - [Copy Broken Links](#copy-broken-links)
     - [Search In Course](#search-in-course)
     - [Shift Course Dates](#shift-course-dates)
+    - [Bulk Link Opener](#bulk-link-opener)
   - [Displays](#displays)
     - [Sections Column](#sections-column)
     - [Sections in Breadcrumbs](#sections-in-breadcrumbs)
@@ -103,10 +104,22 @@ Displays a window that allows to shift the dates of selected course items by the
 **Usage:**
 1. Open the **Home** page for any course.  
 2. Click the extension icon in your browser to open its popup.  
-3. Select **Shift Course Dates**.  
+3. Select **Shift Course Dates**.
 4. When all course assets have finished loading, check the boxes next to the items whose dates you want to adjust.  
 5. In **Days to shift**, enter the number of days to move the dates (use a negative number to shift backward).  
 6. Click **Shift Selected Dates** to begin the process.
+
+#### Bulk Link Opener
+
+<img alt="Shift Course Dates Window" src="content/displays/BulkLinkOpener/BulkLinkOpener.png" width="400">
+
+Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.
+
+**Usage:**
+1. Press and hold the Z key.
+2. Click and drag to draw a selection box around the links you want.
+3. Release the mouse button.
+4. Each link inside the box will open in its own new tab.
 
 
 ### Displays
