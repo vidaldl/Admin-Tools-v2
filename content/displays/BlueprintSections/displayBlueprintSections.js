@@ -9,15 +9,37 @@ const blueprintAssociations = () => {
   const associatedCourses = document.querySelectorAll(
     'span[dir="ltr"] .bca-associations-table tr[id^="course_"]'
   );
-  associatedCourses.forEach(row => {
-    const courseID = row.id.split('_')[1];
-    const linkSpan = row.querySelector('td span');
+
+  associatedCourses.forEach((row) => {
+    const courseID = row.id.split("_")[1];
+    if (!courseID) return;
+
+    const linkSpan = row.querySelector("td span");
     if (!linkSpan) return;
-    const currentHTML = linkSpan.innerHTML;
-    const expectedLinkHTML = `<a href="/courses/${courseID}" target="_blank">${currentHTML}</a>`;
-    if (!currentHTML.includes(expectedLinkHTML)) {
-      linkSpan.innerHTML = expectedLinkHTML;
+
+    const href = `/courses/${courseID}`;
+
+    // If we already wrapped it, do nothing (idempotent).
+    const existingAnchor = linkSpan.querySelector("a");
+    if (existingAnchor) {
+      if (existingAnchor.getAttribute("href") !== href) {
+        existingAnchor.setAttribute("href", href);
+      }
+      if (existingAnchor.getAttribute("target") !== "_blank") {
+        existingAnchor.setAttribute("target", "_blank");
+      }
+      return;
     }
+
+    // Wrap existing contents (preserves any formatting/nodes inside the span).
+    const a = document.createElement("a");
+    a.href = href;
+    a.target = "_blank";
+
+    while (linkSpan.firstChild) {
+      a.appendChild(linkSpan.firstChild);
+    }
+    linkSpan.appendChild(a);
   });
 };
 
