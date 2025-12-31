@@ -12,7 +12,9 @@ async function buildDetails(row) {
   const courseLink = row.querySelector('a[href*="/courses/"]');
   if (!courseLink) throw new Error("Course link not found in row.");
   const href = courseLink.getAttribute('href');
-  const courseID = href.split('/courses/')[1];
+  const match = href.match(/\/courses\/(\d+)/);
+  const courseID = match?.[1];
+  if (!courseID) throw new Error("Course ID not found in link.");
   const info = { row, courseLink, courseID, sections: [] };
 
   const host = window.location.origin;
@@ -81,7 +83,8 @@ function populateSectionsColumn(courses, columnID) {
 async function main() {
   const tbody = document.querySelector('tbody[data-automation="courses list"]');
   if (!tbody) return;
-  courseRows = Array.from(tbody.querySelectorAll('tr')).slice(1);
+  courseRows = Array.from(tbody.querySelectorAll('tr'))
+    .filter(row => row.querySelector('a[href*="/courses/"]'));
   createColumn('crossListedSections', 'Sections');
   createColumnCells('crossListedSections');
   try {
