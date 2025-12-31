@@ -111,6 +111,14 @@ const displayScripts = [
     name: "Bulk Link Opener",
     description: `Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.`,
     runAt: "document_idle"
+  },
+  {
+    id: "actAsTeacher",
+    file: "content/displays/actAsTeacher/actAsTeacher.js",
+    matches: ["https://*.instructure.com/courses/*"],
+    name: "Act As Teacher",
+    description: `If a teacher is enrolled, a button appears allowing the user to switch to acting as the teacher.`,
+    runAt: "document_idle"
   }
   // Add additional display scripts as needed
 ];
