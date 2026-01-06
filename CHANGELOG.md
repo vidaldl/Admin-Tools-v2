@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.1] - 2026-01-06
+### Added
+- Added markdown and a screenshot of the look of the feature.
+- Edited changelog to keep it up-to-date.
+
 ## [2.5.0] - 2026-01-02
 ### Added
 - Added "Act As Teacher" functionality that detects active teachers in a Canvas course and provides a dropdown and impersonate button in the UI.
