@@ -27,13 +27,5 @@ The `actAsTeacher.js` script is a display function for the BYUI Canvas Admin Too
   Include `actAsTeacher.js` as a display content script in your extension. It is designed to run on Canvas LMS course pages (or other target pages) that have active teachers.
 
 
-## Customization
-
-- **Debounce Timing YET TO BE EDITED:**  
-  Adjust the debounce delay in the `observeChanges` function if needed.
-- **Styling:**  
-  Modify the link or container styles directly in the function as required.
-
-
 
 
