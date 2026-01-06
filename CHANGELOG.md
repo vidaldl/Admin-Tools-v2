@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.0] - 2026-01-02
+### Added
+- Added "Act As Teacher" functionality that detects active teachers in a Canvas course and provides a dropdown and impersonate button in the UI.
+- Improved the logic of course-related UI scripts.
+
 ## [2.4.0] - 2025-06-18
 ### Added
 - Added "Bulk Link Opener" functionality that Enables users to hold the Z key and drag a selection box over links on a webpage to open them all in new tabs.
