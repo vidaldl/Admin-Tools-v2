@@ -14,7 +14,7 @@ The `actAsTeacher.js` script is a display function for the BYUI Canvas Admin Too
 
 1. **Impersonate button population:**  
    - The `ensureActAsTeacherControlsHost` function checks for any existing "Impersonate" button and populates one if there is none.
-   - For each teacher in the course, it makes an HTTP request to Canvas and sorts the fetched teachers alphabetically.
+   - For each teacher in the course, it makes an API call to Canvas and sorts the fetched teachers alphabetically.
 
 2. **Dynamic navigation bar checker**
    - The `ensureBottomNavbar` function dynamicaly checks for the existence of a navigation bar populated by another script.
