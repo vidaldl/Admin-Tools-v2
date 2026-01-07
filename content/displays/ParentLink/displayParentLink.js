@@ -33,7 +33,7 @@ function createParentNavbar() {
     position: 'fixed',
     bottom: bottomOffset,  // prevents the navbar being covered by the impersonate bar
     left: sidebarWidth,
-    display: 'flex'
+    display: 'flex',
   });
   
   document.body.appendChild(navbar);
@@ -70,6 +70,7 @@ async function addBlueprintParent() {
       }
       const blueprintID = blueprintData[0].blueprint_course.id;
       const navbar = document.getElementById('navToModule_ext');
+
       // Create an anchor element for the parent blueprint link
       const anchor = document.createElement('a');
       anchor.href = `${host}/courses/${blueprintID}`;

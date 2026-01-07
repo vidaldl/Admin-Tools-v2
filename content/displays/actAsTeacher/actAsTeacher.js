@@ -120,9 +120,9 @@
       color: "black",
       display: "flex",
       alignItems: "center",
-      gap: "8px",
+      gap: "4px",              // This also influences the gap between each module link
       flexWrap: "wrap",        // allow wrapping instead of overflow
-      boxSizing: "border-box",
+      boxSizing: "border-box"
     });
 
     // Avoid forcing a tiny bar that can't fit controls
@@ -144,12 +144,11 @@
     host.id = "actAsTeacher_ext";
 
     Object.assign(host.style, {
-      marginRight: "auto",     // keep the host on the left
       order: "-1",             // move it to the left within the flex bar
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-start",
-      gap: "6px",
+      gap: "8px",
       flexWrap: "wrap",
       minWidth: "0",
       maxWidth: "100%",
