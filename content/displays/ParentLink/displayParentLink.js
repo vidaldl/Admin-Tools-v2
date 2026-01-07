@@ -9,6 +9,14 @@ function createParentNavbar() {
   const sidebar = document.querySelector('#header');
   if (!sidebar) return;
   const sidebarWidth = window.getComputedStyle(sidebar).getPropertyValue('width');
+
+  const impersonateBar = document.getElementById('fixed_bottom');
+  let bottomOffset = '0';
+  if (impersonateBar) {
+    const barHeight = window.getComputedStyle(impersonateBar).getPropertyValue('height');
+    const height = parseInt(barHeight);
+    bottomOffset = `${height}px`;
+  }
   
   const navbar = document.createElement('div');
   navbar.id = 'navToModule_ext';
@@ -23,7 +31,7 @@ function createParentNavbar() {
     padding: '2px',
     color: 'black',
     position: 'fixed',
-    bottom: '0',
+    bottom: bottomOffset,  // prevents the navbar being covered by the impersonate bar
     left: sidebarWidth,
     display: 'flex'
   });
