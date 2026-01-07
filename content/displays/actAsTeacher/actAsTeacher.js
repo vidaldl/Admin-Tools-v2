@@ -120,7 +120,7 @@
       color: "black",
       display: "flex",
       alignItems: "center",
-      gap: "4px",              // This also influences the gap between each module link
+      gap: "3px",              // This also influences the gap between each module link
       flexWrap: "wrap",        // allow wrapping instead of overflow
       boxSizing: "border-box"
     });
@@ -151,7 +151,7 @@
       gap: "8px",
       flexWrap: "wrap",
       minWidth: "0",
-      maxWidth: "100%",
+      maxWidth: "100%"
     });
 
     navbar.appendChild(host);

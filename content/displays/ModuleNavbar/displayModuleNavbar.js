@@ -28,7 +28,7 @@ const createNavbar = () => {
 
   navbar.id = 'navToModule_ext';
   Object.assign(navbar.style, {
-    height: '24px',
+    height: '36px',
     lineHeight: '24px',
     width: `calc(100vw - ${sidebarWidth})`,
     maxWidth: `calc(100vw - ${sidebarWidth})`,
@@ -40,7 +40,8 @@ const createNavbar = () => {
     position: 'fixed',
     bottom: bottomOffset,  // prevents the navbar being covered by the impersonate bar
     left: sidebarWidth,
-    display: 'flex'
+    display: 'flex',
+    alignItems: 'center'
   });
   document.body.appendChild(navbar);
 };
