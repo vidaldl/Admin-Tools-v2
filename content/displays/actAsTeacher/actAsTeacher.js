@@ -97,10 +97,18 @@
       document.body.appendChild(navbar);
     }
 
+    const impersonateBar = document.getElementById('fixed_bottom');
+    let bottomOffset = '0';
+    if (impersonateBar) {
+      const barHeight = window.getComputedStyle(impersonateBar).getPropertyValue('height');
+      const height = parseInt(barHeight);
+      bottomOffset = `${height}px`;
+    }
+
     // Normalize styles (even if created by another script) so it can't overflow
     Object.assign(navbar.style, {
       position: "fixed",
-      bottom: "0",
+      bottom: bottomOffset,    // prevents the navbar being covered by the impersonate bar
       left: sidebarWidth,
       right: "0",              // key: prevents off-screen width issues
       width: "auto",
