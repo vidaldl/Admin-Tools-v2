@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.2] - 2026-01-08
+### Added
+- Fixed the navbar display logic to prevent it being blocked or overlapped by other web components.
+
 ## [2.5.1] - 2026-01-06
 ### Added
 - Added markdown and a screenshot of the look of the feature.
