@@ -97,10 +97,18 @@
       document.body.appendChild(navbar);
     }
 
+    const impersonateBar = document.getElementById('fixed_bottom');
+    let bottomOffset = '0';
+    if (impersonateBar) {
+      const barHeight = window.getComputedStyle(impersonateBar).getPropertyValue('height');
+      const height = parseInt(barHeight);
+      bottomOffset = `${height}px`;
+    }
+
     // Normalize styles (even if created by another script) so it can't overflow
     Object.assign(navbar.style, {
       position: "fixed",
-      bottom: "0",
+      bottom: bottomOffset,    // prevents the navbar being covered by the impersonate bar
       left: sidebarWidth,
       right: "0",              // key: prevents off-screen width issues
       width: "auto",
@@ -112,9 +120,9 @@
       color: "black",
       display: "flex",
       alignItems: "center",
-      gap: "8px",
+      gap: "3px",              // This also influences the gap between each module link
       flexWrap: "wrap",        // allow wrapping instead of overflow
-      boxSizing: "border-box",
+      boxSizing: "border-box"
     });
 
     // Avoid forcing a tiny bar that can't fit controls
@@ -136,15 +144,14 @@
     host.id = "actAsTeacher_ext";
 
     Object.assign(host.style, {
-      marginRight: "auto",     // keep the host on the left
       order: "-1",             // move it to the left within the flex bar
       display: "flex",
       alignItems: "center",
       justifyContent: "flex-start",
-      gap: "6px",
+      gap: "8px",
       flexWrap: "wrap",
       minWidth: "0",
-      maxWidth: "100%",
+      maxWidth: "100%"
     });
 
     navbar.appendChild(host);

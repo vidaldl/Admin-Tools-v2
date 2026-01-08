@@ -17,9 +17,18 @@ const createNavbar = () => {
   if (!sidebar) return;
   const sidebarWidth = window.getComputedStyle(sidebar).getPropertyValue('width');
   const navbar = document.createElement('div');
+
+  const impersonateBar = document.getElementById('fixed_bottom');
+  let bottomOffset = '0';
+  if (impersonateBar) {
+    const barHeight = window.getComputedStyle(impersonateBar).getPropertyValue('height');
+    const height = parseInt(barHeight);
+    bottomOffset = `${height}px`;
+  }
+
   navbar.id = 'navToModule_ext';
   Object.assign(navbar.style, {
-    height: '24px',
+    height: '36px',
     lineHeight: '24px',
     width: `calc(100vw - ${sidebarWidth})`,
     maxWidth: `calc(100vw - ${sidebarWidth})`,
@@ -29,9 +38,10 @@ const createNavbar = () => {
     padding: '2px',
     color: 'black',
     position: 'fixed',
-    bottom: '0',
+    bottom: bottomOffset,  // prevents the navbar being covered by the impersonate bar
     left: sidebarWidth,
-    display: 'flex'
+    display: 'flex',
+    alignItems: 'center'
   });
   document.body.appendChild(navbar);
 };
