@@ -3,6 +3,7 @@
 ## [2.5.2] - 2026-01-08
 ### Added
 - Fixed the navbar display logic to prevent it being blocked or overlapped by other web components.
+- Fixed the "Blueprint Parent Link" display script to show up in the correct location.
 
 ## [2.5.1] - 2026-01-06
 ### Added
